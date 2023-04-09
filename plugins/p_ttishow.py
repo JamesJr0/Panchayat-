@@ -22,7 +22,7 @@ async def save_group(bot, message):
         if message.chat.id in temp.BANNED_CHATS:
             # Inspired from a boat of a banana tree
             buttons = [[
-                InlineKeyboardButton('Support', url=f'https://t.me/{SUPPORT_CHAT}')
+                InlineKeyboardButton('Support', url=f'https://t.me/dkbotxchats')
             ]]
             reply_markup=InlineKeyboardMarkup(buttons)
             k = await message.reply(
@@ -37,23 +37,29 @@ async def save_group(bot, message):
             await bot.leave_chat(message.chat.id)
             return
         buttons = [[
-            InlineKeyboardButton('ℹ️ Help', url=f"https://t.me/Sathan_Of_Telegram"),
-            InlineKeyboardButton('🧑‍🏫Tutorial', url='https://t.me/Cinemaathattakam_Group')
+            InlineKeyboardButton('ʜᴇʟᴘ', url=f"https://t.me/{temp.U_NAME}?start=help"),
+            InlineKeyboardButton('ᴜᴘᴅᴀᴛᴇs', url='https://t.me/dk_botx')
         ]]
         reply_markup=InlineKeyboardMarkup(buttons)
         await message.reply_text(
-                        text=f"<b>Thankyou For Adding Me In {message.chat.title} ❣️\n\n›› Don't Forget Make Admin 🙃\n›› Is Any Doubts About Using Me Click Below Button..⚡⚡.</b>",
+                        text=f"<b>Thankyou For Adding Me In {message.chat.title} ❣️</b>",
             reply_markup=reply_markup)
     else:
         settings = await get_settings(message.chat.id)
         if settings["welcome"]:
             for u in message.new_chat_members:
+                buttons = [[
+                InlineKeyboardButton('🍂 Jᴏɪɴ Fᴏʀ Mᴏʀᴇ 🍂', url="https://t.me/+UGphxBkNcAg3Mzg1")
+            ]]
                 if (temp.MELCOW).get('welcome') is not None:
                     try:
                         await (temp.MELCOW['welcome']).delete()
                     except:
                         pass
-                temp.MELCOW['welcome'] = await message.reply(f"<b>Hey , {u.mention}, Welcome to {message.chat.title}</b>")
+                temp.MELCOW['welcome'] = await message.reply_video(
+                video="https://telegra.ph/file/ebd9cb5d817f79ee50f95.mp4",
+                caption=f"<b>👋 Hey {u.mention} how are you?🥰,</b><b>Welcome to {message.chat.title} ✨</b>",
+                reply_markup=InlineKeyboardMarkup(buttons))
 
 
 @Client.on_message(filters.command('leave') & filters.user(ADMINS))
@@ -67,7 +73,7 @@ async def leave_a_chat(bot, message):
         chat = chat
     try:
         buttons = [[
-            InlineKeyboardButton('Support', url=f'https://t.me/{SUPPORT_CHAT}')
+            InlineKeyboardButton('Support', url=f'https://t.me/dkbotxchats')
         ]]
         reply_markup=InlineKeyboardMarkup(buttons)
         await bot.send_message(
@@ -106,7 +112,7 @@ async def disable_chat(bot, message):
     await message.reply('Chat Successfully Disabled')
     try:
         buttons = [[
-            InlineKeyboardButton('Support', url=f'https://t.me/{SUPPORT_CHAT}')
+            InlineKeyboardButton('Support', url=f'https://t.me/heisenberg_tg')
         ]]
         reply_markup=InlineKeyboardMarkup(buttons)
         await bot.send_message(
@@ -137,9 +143,9 @@ async def re_enable_chat(bot, message):
     await message.reply("Chat Successfully re-enabled")
 
 
-@Client.on_message(filters.command('stats') & filters.incoming)
+@Client.on_message(filters.command('msonedb') & filters.incoming)
 async def get_ststs(bot, message):
-    rju = await message.reply('Fetching stats..')
+    rju = await message.reply('Fetching Msone Database stats..')
     total_users = await db.total_users_count()
     totl_chats = await db.total_chat_count()
     files = await Media.count_documents()
@@ -267,6 +273,6 @@ async def list_chats(bot, message):
     try:
         await raju.edit_text(out)
     except MessageTooLong:
-        with open('chats.txt', 'w+') as outfile:
+        with open('SDchats.txt', 'w+') as outfile:
             outfile.write(out)
         await message.reply_document('chats.txt', caption="List Of Chats")
