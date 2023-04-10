@@ -31,20 +31,7 @@ async def help(client, message):
         InlineKeyboardButton('ᴄʟᴏsᴇ', callback_data='close')
     ]]
         reply_markup = InlineKeyboardMarkup(buttons)
-
-
-
-@Client.on_message(filters.command("start") & filters.incoming)
-async def start(client, message):
-    if message.chat.type in ['group', 'supergroup']:
-        buttons = [[
-        InlineKeyboardButton('⚙️ ᴜᴘᴅᴀᴛᴇs ᴄʜᴀɴɴᴇʟ ⚙️', url=f'http://t.me/dk_botx') ] ,
-      [
-        InlineKeyboardButton('ᴀʙᴏᴜᴛ', callback_data='about'),
-        InlineKeyboardButton('ᴄʟᴏsᴇ', callback_data='close')
-    ]]
-       
-        reply_markup = InlineKeyboardMarkup(buttons)
+reply_markup = InlineKeyboardMarkup(buttons)
                 await message.reply_photo(
                 photo=rando.choice(MY_PICS),
                 script.START_TXT.format(
@@ -55,7 +42,17 @@ async def start(client, message):
                     temp.B_NAME,
                 ),
                 reply_markup=reply_markup
-            )
+                )
+
+@Client.on_message(filters.command("start") & filters.incoming)
+async def start(client, message):
+    if message.chat.type in ['group', 'supergroup']:
+        buttons = [[
+        InlineKeyboardButton('⚙️ ᴜᴘᴅᴀᴛᴇs ᴄʜᴀɴɴᴇʟ ⚙️', url=f'http://t.me/dk_botx') ] ,
+      [
+        InlineKeyboardButton('ᴀʙᴏᴜᴛ', callback_data='about'),
+        InlineKeyboardButton('ᴄʟᴏsᴇ', callback_data='close')
+    ]]
         if not START_IMAGE_URL:
             await message.reply(
                 script.START_TXT.format(
