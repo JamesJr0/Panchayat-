@@ -49,6 +49,7 @@ async def start(client, message):
         InlineKeyboardButton('ᴀʙᴏᴜᴛ', callback_data='about'),
         InlineKeyboardButton('ᴄʟᴏsᴇ', callback_data='close')
     ]]
+        reply_markup = InlineKeyboardMarkup(buttons)
         if not START_IMAGE_URL:
             await message.reply(
                 script.START_TXT.format(
