@@ -29,7 +29,7 @@ BUTTONS = {}
 SPELL_CHECK = {}
 
 
-@Client.on_message(filters.group & filters.text & ~filters.edited & filters.incoming)
+@Client.on_message((filters.group | filters.private) & filters.text & filters.incoming)
 async def give_filter(client, message):
     k = await manual_filters(client, message)
     if k == False:
@@ -347,11 +347,9 @@ async def cb_handler(client: Client, query: CallbackQuery):
             except Exception as e:
                 logger.exception(e)
             f_caption = f_caption
-            buttons = [
-            [
-                InlineKeyboardButton('🌿 Jᴏɪɴ Fᴏʀ Mᴏʀᴇ 🌿', url=f"{UPDATES_CHANNEL}")
-            ]
-            ]
+            buttons = [ [ InlineKeyboardButton("⚡ᴜᴘᴅᴀᴛᴇꜱ", url="https://t.me/cpflicks"),
+                          InlineKeyboardButton("ꜱʜᴀʀᴇ ⚡", url="https://t.me/share/url?url=https://t.me/cpsearchxbot") ],
+                        [ InlineKeyboardButton("🌀 ꜱᴜᴘᴘᴏʀᴛ ᴄʜᴀᴛ 🌀", url="https://t.me/dkbotxchats") ] ]
         if f_caption is None:
             f_caption = f"{files.file_name}"
 
@@ -369,7 +367,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     caption=f_caption,
                     protect_content=True if ident == "filep" else False 
                 )
-                await query.answer('𝖨 𝖧𝖺𝗏𝖾 𝖲𝖾𝗇𝗍 𝖸𝗈𝗎 𝖥𝗂𝗅𝖾𝗌 𝖯𝖾𝗋𝗌𝗈𝗇𝖺𝗅𝗒... 𝖢𝗁𝖾𝖼𝗄 𝖬𝗒 𝖯𝖬', show_alert=True)
+                await query.answer('𝖨 𝖧𝖺𝗏𝖾 𝖲𝖾𝗇𝗍 𝖸𝗈𝗎 𝖥𝗂𝗅𝖾𝗌 𝖯𝖾𝗋𝗌𝗈𝗇𝖺𝗅𝗒... 𝖢𝗁𝖾𝖼𝗄 𝖬𝗒 𝖯𝖬', show_alert=False)
         except UserIsBlocked:
             await query.answer('Unblock the bot mahn !', show_alert=True)
         except PeerIdInvalid:
@@ -440,7 +438,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
    elif query.data == "about":
         buttons = [[
             InlineKeyboardButton('ᴜᴘᴅᴀᴛᴇs', url=f"{UPDATES_CHANNEL}"),
-            InlineKeyboardButton('ɢʀᴏᴜᴘ', url='https://t.me/+RYKxhcuNB1Q3Yzg1'),
+            InlineKeyboardButton('ꜱᴜᴘᴘᴏʀᴛ', url='https://t.me/DKBOTxCHATS'),
             InlineKeyboardButton('ʙᴀᴄᴋ', callback_data='start')
         ]]
         reply_markup = InlineKeyboardMarkup(buttons)
@@ -540,7 +538,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
             parse_mode=enums.ParseMode.HTML
         )
     elif query.data == "rfrsh":
-        await query.answer("Fetching MsoneDb....")
+        await query.answer("Fetching CpFlicksDb....")
         buttons = [[
             InlineKeyboardButton('👩‍🦯 Back', callback_data='help'),
             InlineKeyboardButton('♻️', callback_data='rfrsh')
@@ -710,7 +708,7 @@ async def auto_filter(client, msg, spoll=False):
         cap = f"<b>Hai 👋 {message.from_user.mention}</b> 😍\n\n<b>📁 Found ✨  Files For Your Query : #{search} 👇</b>"
     if imdb and imdb.get('poster'):
         try:
-            fmsg = await message.reply_photo('https://te.legra.ph/file/6b21e3f579dc2db5cabd9.jpg', caption=cap[:1024],
+            fmsg = await message.reply_photo('https://telegra.ph/file/5a00bd4b0d6ce1d2092db.jpg', caption=cap[:1024],
                                       reply_markup=InlineKeyboardMarkup(btn))
         except (MediaEmpty, PhotoInvalidDimensions, WebpageMediaEmpty):
             pic = imdb.get('poster')
@@ -779,7 +777,7 @@ async def advantage_spell_chok(msg):
         )
     ] for k, movie in enumerate(movielist)]
     btn.append([InlineKeyboardButton(text="Close", callback_data=f'spolling#{user}#close_spellcheck')])
-    zz = await msg.reply('<b><i>Searching for you result in imdb Wait...🧐<i/></b>')
+    zz = await msg.reply('<b>...🧐</b>')
     await asyncio.sleep(1)
     zz1 = await zz.edit("𝘿𝙄𝘿 𝙔𝙊𝙐 𝙈𝙀𝘼𝙉 𝘼𝙉𝙔 𝙊𝙉𝙀 𝙏𝙃𝙀𝙎𝙀? 🤔",
                     reply_markup=InlineKeyboardMarkup(btn))
