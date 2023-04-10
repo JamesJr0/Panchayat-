@@ -24,7 +24,7 @@ HELP_TXT="""<b>Bro, Check Movie Name In #Google and Try ! Then No Results Add Mo
 MY_PICS=["https://telegra.ph/file/45991424ebfe111f195e4.jpg",
 ]
 
-@Client.on_callback_query(filters.regex("help_back"))
+@Client.on_callback_query(filters.regex("help"))
 async def help(client, message):
         buttons = [[
         InlineKeyboardButton('My group', url=f'http://t.me/dk_botx') ] ,
