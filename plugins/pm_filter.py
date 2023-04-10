@@ -430,7 +430,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
             reply_markup=reply_markup,
             parse_mode=enums.ParseMode.HTML
         )
-   elif query.data == "about":
+    elif query.data == "about":
         buttons = [[
             InlineKeyboardButton('ᴜᴘᴅᴀᴛᴇs', url=f"{UPDATES_CHANNEL}"),
             InlineKeyboardButton('ꜱᴜᴘᴘᴏʀᴛ', url='https://t.me/DKBOTxCHATS'),
