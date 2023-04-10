@@ -1,6 +1,6 @@
 {
-    "name": "EvaMariaBot",
-    "description": "When you going to send file on telegram channel this bot will save that in database, So you can search that easily in inline mode",
+    "name": "CpSearchXbot",
+    "description": "cpFlicks",
     "stack": "container",
     "keywords": [
       "telegram",
@@ -15,8 +15,8 @@
       "index",
       "inline"
     ],
-    "website": "https://github.com/EvamariaTG/EvaMaria",
-    "repository": "https://github.com/EvamariaTG/EvaMaria",
+    "website": "https://github.com/CpFlicks/CpSearchXbot",
+    "repository": "https://github.com/CpFlicks/CpSearchXbot",
     "env": {
         "BOT_TOKEN": {
             "description": "Your bot token.",
@@ -75,7 +75,7 @@
     "formation": {
         "worker": {
             "quantity": 1,
-            "size": "free"
+            "size": "Eco"
         }
     }
 }
