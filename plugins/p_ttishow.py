@@ -49,7 +49,7 @@ async def save_group(bot, message):
         if settings["welcome"]:
             for u in message.new_chat_members:
                 buttons = [[
-                InlineKeyboardButton('🍂 Jᴏɪɴ Fᴏʀ Mᴏʀᴇ 🍂', url="https://t.me/+UGphxBkNcAg3Mzg1")
+                InlineKeyboardButton('🍂 Jᴏɪɴ Fᴏʀ Mᴏʀᴇ 🍂', url="https://t.me/AbOutMe_DK")
             ]]
                 if (temp.MELCOW).get('welcome') is not None:
                     try:
@@ -143,9 +143,9 @@ async def re_enable_chat(bot, message):
     await message.reply("Chat Successfully re-enabled")
 
 
-@Client.on_message(filters.command('msonedb') & filters.incoming & filters.user(ADMINS))
+@Client.on_message(filters.command('spideydb') & filters.incoming & filters.user(ADMINS))
 async def get_ststs(bot, message):
-    rju = await message.reply('Fetching Msone Database stats..')
+    rju = await message.reply('Fetching Cp Database stats..')
     total_users = await db.total_users_count()
     totl_chats = await db.total_chat_count()
     files = await Media.count_documents()
