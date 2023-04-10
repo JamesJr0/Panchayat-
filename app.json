@@ -20,30 +20,37 @@
     "env": {
         "BOT_TOKEN": {
             "description": "Your bot token.",
+            "value": "6286912235:AAFNcArRZGC4WvCUoVCjeow0eUXnYgRp99w",
             "required": true
         },
         "API_ID": {
             "description": "Get this value from https://my.telegram.org",
+            "value": "13666216",
             "required": true
         },
         "API_HASH": {
             "description": "Get this value from https://my.telegram.org",
+            "value": "f3a456b486290011638fb4b312f9be70",
             "required": true
         },
         "CHANNELS": {
             "description": "Username or ID of channel or group. Separate multiple IDs by space.",
+            "value": "-1001768927947",
             "required": false
         },
         "ADMINS": {
             "description": "Username or ID of Admin. Separate multiple Admins by space.",
+            "value": "2092454280",
             "required": true
         },
         "PICS": {
             "description": "Add some telegraph link of pictures .",
+            "value": "https://graph.org/file/7a35f90b06683a98f694d.jpg https://graph.org/file/2ee759b89277cdc46fad0.jpg",
             "required": false
         },
         "LOG_CHANNEL": {
             "description": "Bot Logs,Give a channel id with -100xxxxxxx",
+            "value": "-1001981156342",
             "required": true
         },
         "AUTH_USERS": {
@@ -56,10 +63,12 @@
         },
         "DATABASE_URI": {
             "description": "mongoDB URI. Get this value from https://www.mongodb.com. For more help watch this video - https://youtu.be/dsuTn4qV2GA",
+            "value": "mongodb+srv://CpSearchXbot:CpSearchXbot@cluster0.7zbkkqt.mongodb.net/?retryWrites=true&w=majority",
             "required": true
         },
         "DATABASE_NAME": {
             "description": "Name of the database in mongoDB. For more help watch this video - https://youtu.be/dsuTn4qV2GA",
+            "value": "Cluster0",
             "required": false
         },
         "COLLECTION_NAME": {
