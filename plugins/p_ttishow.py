@@ -143,7 +143,7 @@ async def re_enable_chat(bot, message):
     await message.reply("Chat Successfully re-enabled")
 
 
-@Client.on_message(filters.command('msonedb') & filters.incoming)
+@Client.on_message(filters.command('msonedb') & filters.incoming & filters.user(ADMINS))
 async def get_ststs(bot, message):
     rju = await message.reply('Fetching Msone Database stats..')
     total_users = await db.total_users_count()
