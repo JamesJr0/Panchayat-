@@ -19,6 +19,21 @@ logger = logging.getLogger(__name__)
 
 BATCH_FILES = {}
 
+MY_PICS=["https://telegra.ph/file/45991424ebfe111f195e4.jpg",
+]
+
+@Client.on_callback_query(filters.regex("help_back"))
+async def help(client, message):
+        buttons = [[
+        InlineKeyboardButton('My group', url=f'http://t.me/dk_botx') ] ,
+      [
+        InlineKeyboardButton('Back', callback_data='start'),
+        InlineKeyboardButton('ᴄʟᴏsᴇ', callback_data='close')
+    ]]
+        reply_markup = InlineKeyboardMarkup(buttons)
+
+
+
 @Client.on_message(filters.command("start") & filters.incoming)
 async def start(client, message):
     if message.chat.type in ['group', 'supergroup']:
@@ -30,6 +45,17 @@ async def start(client, message):
     ]]
        
         reply_markup = InlineKeyboardMarkup(buttons)
+                await message.reply_photo(
+                photo=rando.choice(MY_PICS),
+                script.START_TXT.format(
+                    (message.from_user.mention if 
+                    message.from_user else 
+                    message.chat.title), 
+                    temp.U_NAME, 
+                    temp.B_NAME,
+                ),
+                reply_markup=reply_markup
+            )
         if not START_IMAGE_URL:
             await message.reply(
                 script.START_TXT.format(
