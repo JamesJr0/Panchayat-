@@ -32,7 +32,7 @@ async def help(client, message):
     ]]
         reply_markup = InlineKeyboardMarkup(buttons)
                 await message.reply_photo(
-                photo=rando.choice(MY_PICS),
+                photo=random.choice(MY_PICS),
                 script.START_TXT.format(
                     (message.from_user.mention if 
                     message.from_user else 
