@@ -19,6 +19,8 @@ logger = logging.getLogger(__name__)
 
 BATCH_FILES = {}
 
+HELP_TXT="""HEY HERE IS MY HELP CMDS"""
+
 MY_PICS=["https://telegra.ph/file/45991424ebfe111f195e4.jpg",
 ]
 
@@ -31,17 +33,12 @@ async def help(client, message):
         InlineKeyboardButton('ᴄʟᴏsᴇ', callback_data='close')
     ]]
         reply_markup = InlineKeyboardMarkup(buttons)
-                await message.reply_photo(
-                photo=random.choice(MY_PICS),
-                script.START_TXT.format(
-                    (message.from_user.mention if 
-                    message.from_user else 
-                    message.chat.title), 
-                    temp.U_NAME, 
-                    temp.B_NAME,
-                ),
-                reply_markup=reply_markup
-                )
+            await message.reply_photo(
+            photo=random.choice(MY_PICS),
+            caption=HELP_TXT
+            reply_markup=reply_markup,
+            parse_mode=enums.ParseMode.HTML
+        )
 
 @Client.on_message(filters.command("start") & filters.incoming)
 async def start(client, message):
