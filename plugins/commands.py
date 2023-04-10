@@ -31,7 +31,6 @@ async def help(client, message):
         InlineKeyboardButton('ᴄʟᴏsᴇ', callback_data='close')
     ]]
         reply_markup = InlineKeyboardMarkup(buttons)
-reply_markup = InlineKeyboardMarkup(buttons)
                 await message.reply_photo(
                 photo=rando.choice(MY_PICS),
                 script.START_TXT.format(
