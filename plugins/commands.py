@@ -19,27 +19,6 @@ logger = logging.getLogger(__name__)
 
 BATCH_FILES = {}
 
-HELP_TXT="""<b>Bro, Check Movie Name In #Google and Try ! Then No Results Add Movie Year and Try , Again No Results ? It's Not Available In Our Database Or Movie Not Released !\n\nബ്രോ, മൂവിയുടെ പേര് മാത്രം #Google നോക്കിയിട്ട് അടിച്ചു നോക്കുക..!!\n\nഎന്നിട്ടും കിട്ടിയില്ലെങ്കിൽ പേരിന്റെ കൂടെ മൂവി ഇറങ്ങിയ വർഷം കൂടി അടിച്ചു നോക്ക് 😁\n\nഎനിയും കിട്ടിയില്ലെങ്കിൽ ആ മൂവി ഞങ്ങളുടെ ഡാറ്റാബേസിൽ ഇല്ല, അല്ലെങ്കിൽ ആ മൂവി ഇറങ്ങിയിട്ടില്ല എന്ന് മനസ്സിലാക്കുക! 🤗⚠️\n\n📌 Any Help For Movie Searching Contact Admin.</b>"""
-
-MY_PICS=["https://telegra.ph/file/5a00bd4b0d6ce1d2092db.jpg",
-]
-
-@Client.on_callback_query(filters.regex("help"))
-async def help(client, message):
-        buttons = [[
-        InlineKeyboardButton('🌿 Jᴏɪɴ Fᴏʀ Mᴏʀᴇ 🌿', url=f'http://t.me/CpFlicks') ] ,
-      [
-        InlineKeyboardButton('𝖡𝖺𝖼𝗄', callback_data='start'),
-        InlineKeyboardButton('𝖢𝗅𝗈𝗌𝖾', callback_data='close')
-    ]]
-        reply_markup = InlineKeyboardMarkup(buttons)
-            await message.reply_photo(
-            photo=random.choice(MY_PICS),
-            caption=HELP_TXT
-            reply_markup=reply_markup,
-            parse_mode=enums.ParseMode.HTML
-        )
-
 @Client.on_message(filters.command("start") & filters.incoming)
 async def start(client, message):
     if message.chat.type in ['group', 'supergroup']:
