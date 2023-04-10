@@ -71,6 +71,16 @@
             "value": "Cluster0",
             "required": false
         },
+        "UPSTREAM_REPO": {
+            "description": "Edited repo link",
+            "value": "https://github.com/CpFlicks/CpSearchXbot",
+            "required": false
+        },
+        "IMDB": {
+            "description": "Imdb On or Off",
+            "value": "False",
+            "required": false
+        },
         "COLLECTION_NAME": {
             "description": "Name of the collections. Defaults to Telegram_files. If you are using the same database, then use different collection name for each bot",
             "value": "Telegram_files",
