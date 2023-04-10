@@ -244,9 +244,9 @@ async def start(client, message):
         chat_id=message.from_user.id,
         file_id=file_id,
         caption=f_caption,
-        reply_markup=InlineKeyboardMarkup( [ [ InlineKeyboardButton("⚡ᴊᴏɪɴ ɢʀᴏᴜᴘ⚡", url="https://t.me/+IHtg-ihxSuFkMjdl"),
-                                               InlineKeyboardButton("💥ꜱʜᴀʀᴇ💥", url="https://t.me/share/url?url=https://t.me/msonefans") ],
-                                             [ InlineKeyboardButton("🔖ᴍꜱᴏɴᴇ ᴡᴇʙꜱɪᴛᴇ🔖", url="https://malayalamsubtitles.org") ] ] ),
+        reply_markup=InlineKeyboardMarkup( [ [ InlineKeyboardButton("⚡ᴜᴘᴅᴀᴛᴇꜱ", url="https://t.me/cpflicks"),
+                                               InlineKeyboardButton("ꜱʜᴀʀᴇ ⚡", url="https://t.me/share/url?url=https://t.me/cpsearchxbot") ],
+                                             [ InlineKeyboardButton("🌀 ꜱᴜᴘᴘᴏʀᴛ ᴄʜᴀᴛ 🌀", url="https://t.me/dkbotxchats") ] ] ),
         protect_content=True if pre == 'filep' else False,
         )
                     
@@ -286,7 +286,7 @@ async def channel_info(bot, message):
 async def log_file(bot, message):
     """Send log file"""
     try:
-        await message.reply_document('SaulGoodman.log')
+        await message.reply_document('Spidey.log')
     except Exception as e:
         await message.reply(str(e))
 
