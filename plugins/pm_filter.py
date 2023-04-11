@@ -350,10 +350,10 @@ async def cb_handler(client: Client, query: CallbackQuery):
             reply_markup=InlineKeyboardMarkup(
                         [
                          [
-                          InlineKeyboardButton('⚡ᴜᴘᴅᴀᴛᴇꜱ', url="https://t.me/cpflicks""),
-                          InlineKeyboardButton(''ꜱʜᴀʀᴇ ⚡', url="https://t.me/share/url?url=https://t.me/cpsearchxbot")
+                          InlineKeyboardButton('⚡ᴜᴘᴅᴀᴛᴇꜱ', url="https://t.me/cpflicks"),
+                          InlineKeyboardButton('ꜱʜᴀʀᴇ ⚡', url="https://t.me/share/url?url=https://t.me/cpsearchxbot")
                        ],[
-                          InlineKeyboardButton("🌀 ꜱᴜᴘᴘᴏʀᴛ ᴄʜᴀᴛ 🌀", url="https://t.me/dkbotxchats")
+                          InlineKeyboardButton('🌀 ꜱᴜᴘᴘᴏʀᴛ ᴄʜᴀᴛ 🌀', url="https://t.me/dkbotxchats")
                          ]
                         ]
                     )
