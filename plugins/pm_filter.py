@@ -352,6 +352,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                 InlineKeyboardButton('🌀 ꜱᴜᴘᴘᴏʀᴛ ᴄʜᴀᴛ 🌀', url="https://t.me/dkbotxchats")
             ]
             ]
+            reply_markup = InlineKeyboardMarkup(buttons)
         if f_caption is None:
             f_caption = f"{files.file_name}"
 
