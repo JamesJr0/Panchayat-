@@ -14,7 +14,6 @@ def is_enabled(value, default):
         return default
 
 # Bot information
-# Bot information
 SESSION = environ.get('SESSION', 'Media_search')
 API_ID = int(environ.get('API_ID', '13666216'))
 API_HASH = environ.get('API_HASH', 'f3a456b486290011638fb4b312f9be70')
@@ -66,9 +65,11 @@ MELCOW_NEW_USERS = is_enabled((environ.get('MELCOW_NEW_USERS', "True")), True)
 UPDATES_CHANNEL = environ.get('UPDATES_CHANNEL', "t.me/CpFlicks")
 PROTECT_CONTENT = is_enabled((environ.get('PROTECT_CONTENT', "False")), False)
 PUBLIC_FILE_STORE = is_enabled((environ.get('PUBLIC_FILE_STORE', "False")), False)
-
 DELETE_TIME = int(environ.get('DELETE_TIME', 300))
 START_IMAGE_URL = environ.get('START_IMAGE_URL', "https://graph.org/file/7a35f90b06683a98f694d.jpg")
+
+#Session Name
+SESSION_NAME = str(getenv('SESSION_NAME', 'cpsearchxbot'))
 
 LOG_STR = "Current Cusomized Configurations are:-\n"
 LOG_STR += ("IMDB Results are enabled, Bot will be showing imdb details for you queries.\n" if IMDB else "IMBD Results are disabled.\n")
