@@ -48,7 +48,7 @@ REQ_CHANNEL = int(False) if REQ_CHANNEL and id_pattern.search(False) else False
 JOIN_REQS_DB = environ.get("JOIN_REQS_DB", DATABASE_URI)
 
 # Others
-BIN_CHANNEL = int(environ. get('BIN_CHANNEL',))
+BIN_CHANNEL = int(environ. get('BIN_CHANNEL',-1001868526243))
 LOG_CHANNEL = int(environ.get('LOG_CHANNEL', -1001981156342))
 SUPPORT_CHAT = environ.get('SUPPORT_CHAT', 'DKBOTxCHATS')
 P_TTI_SHOW_OFF = is_enabled((environ.get('P_TTI_SHOW_OFF', "False")), False)
