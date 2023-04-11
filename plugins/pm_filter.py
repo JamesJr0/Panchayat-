@@ -127,7 +127,7 @@ async def advantage_spoll_choker(bot, query):
     if not movies:
         return await query.answer("You are clicking on an old button which is expired.", show_alert=True)
     movie = movies[(int(movie_))]
-    await query.answer('Checking for Movie in  Msone database...')
+    await query.answer('Checking for Movie in  Cp database...')
     k = await manual_filters(bot, query.message, text=movie)
     if k == False:
         files, offset, total_results = await get_search_results(movie, offset=0, filter=True)
@@ -347,16 +347,11 @@ async def cb_handler(client: Client, query: CallbackQuery):
             except Exception as e:
                 logger.exception(e)
             f_caption = f_caption
-            reply_markup=InlineKeyboardMarkup(
-                        [
-                         [
-                          InlineKeyboardButton('⚡ᴜᴘᴅᴀᴛᴇꜱ', url="https://t.me/cpflicks"),
-                          InlineKeyboardButton('ꜱʜᴀʀᴇ ⚡', url="https://t.me/share/url?url=https://t.me/cpsearchxbot")
-                       ],[
-                          InlineKeyboardButton('🌀 ꜱᴜᴘᴘᴏʀᴛ ᴄʜᴀᴛ 🌀', url="https://t.me/dkbotxchats")
-                         ]
-                        ]
-                    )
+            buttons = [
+            [
+                InlineKeyboardButton('🌀 ꜱᴜᴘᴘᴏʀᴛ ᴄʜᴀᴛ 🌀', url="https://t.me/dkbotxchats")
+            ]
+            ]
         if f_caption is None:
             f_caption = f"{files.file_name}"
 
@@ -374,7 +369,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     caption=f_caption,
                     protect_content=True if ident == "filep" else False 
                 )
-                await query.answer('𝖨 𝖧𝖺𝗏𝖾 𝖲𝖾𝗇𝗍 𝖸𝗈𝗎 𝖥𝗂𝗅𝖾𝗌 𝖯𝖾𝗋𝗌𝗈𝗇𝖺𝗅𝗒... 𝖢𝗁𝖾𝖼𝗄 𝖬𝗒 𝖯𝖬', show_alert=False)
+                await query.answer('𝖨 𝖧𝖺𝗏𝖾 𝖲𝖾𝗇𝗍 𝖸𝗈𝗎 𝖥𝗂𝗅𝖾𝗌...', show_alert=False)
         except UserIsBlocked:
             await query.answer('Unblock the bot mahn !', show_alert=True)
         except PeerIdInvalid:
