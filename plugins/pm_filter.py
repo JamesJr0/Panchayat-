@@ -373,7 +373,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     file_id=file_id,
                     caption=f_caption,
                     protect_content=True if ident == "filep" else False
-            buttons = [
+                    buttons = [
             [
                 InlineKeyboardButton('🌀 ꜱᴜᴘᴘᴏʀᴛ ᴄʜᴀᴛ 🌀', url="https://t.me/dkbotxchats")
             ]
