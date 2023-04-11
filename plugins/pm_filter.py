@@ -653,9 +653,9 @@ async def auto_filter(client, msg, spoll=False):
         ]
 
     if offset != "":
-        key = f"{message.chat.id}-{message.message_id}"
+        key = f"{msg.chat.id}-{msg.message_id}"
         BUTTONS[key] = search
-        req = message.from_user.id if message.from_user else 0
+        req = msg.from_user.id if msg.from_user else 0
         btn.append(
             [InlineKeyboardButton(text=f"🗓 1/{round(int(total_results) / 10)}", callback_data="pages"),
              InlineKeyboardButton(text="NEXT ⏩", callback_data=f"next_{req}_{key}_{offset}")]
