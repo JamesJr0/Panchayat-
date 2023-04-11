@@ -1,6 +1,6 @@
 import re
-import getenv
 from os import environ
+from os import getenv
 from dotenv import load_dotenv
 
 # load_dotenv("./config.env")
