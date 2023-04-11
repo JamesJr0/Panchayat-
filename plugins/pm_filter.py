@@ -347,12 +347,16 @@ async def cb_handler(client: Client, query: CallbackQuery):
             except Exception as e:
                 logger.exception(e)
             f_caption = f_caption
-            buttons = [
-            [
-                InlineKeyboardButton('🌀 ꜱᴜᴘᴘᴏʀᴛ ᴄʜᴀᴛ 🌀', url="https://t.me/dkbotxchats")
-            ]
-            ]
-            reply_markup = InlineKeyboardMarkup(buttons)
+                reply_markup=InlineKeyboardMarkup(
+                        [
+                         [
+                          InlineKeyboardButton('⚡ᴜᴘᴅᴀᴛᴇꜱ', url="https://t.me/cpflicks""),
+                          InlineKeyboardButton(''ꜱʜᴀʀᴇ ⚡', url="https://t.me/share/url?url=https://t.me/cpsearchxbot")
+                       ],[
+                          InlineKeyboardButton("🌀 ꜱᴜᴘᴘᴏʀᴛ ᴄʜᴀᴛ 🌀", url="https://t.me/dkbotxchats")
+                         ]
+                        ]
+                    )
         if f_caption is None:
             f_caption = f"{files.file_name}"
 
