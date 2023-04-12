@@ -759,7 +759,7 @@ async def advantage_spell_chok(msg):
     movielist = list(dict.fromkeys(movielist))  # removing duplicates
     if not movielist:
         k = await msg.reply("𝙄 𝘾𝘼𝙉𝙏 𝙁𝙄𝙉𝘿 𝘼𝙉𝙔𝙏𝙃𝙄𝙉𝙂 𝙍𝙀𝙇𝙀𝘼𝙏𝙀𝘿 𝙏𝙊 𝙏𝙃𝘼𝙏 𝙎𝙋𝙀𝙇𝙇𝙄𝙉𝙂, 𝘾𝙃𝙀𝘾𝙆 𝙏𝙃𝙀 𝙎𝙋𝙀𝙇𝙇𝙄𝙉𝙂")
-        await asyncio.sleep(8)
+        await asyncio.sleep(90)
         await k.delete()
         return
     SPELL_CHECK[msg.id] = movielist
@@ -770,11 +770,11 @@ async def advantage_spell_chok(msg):
         )
     ] for k, movie in enumerate(movielist)]
     btn.append([InlineKeyboardButton(text="Close", callback_data=f'spolling#{user}#close_spellcheck')])
-    zz = await msg.reply('<b>...🧐</b>')
+    zz = await msg.reply('<code>Processing in Database........</code>')
     await asyncio.sleep(1)
-    zz1 = await zz.edit("𝘿𝙄𝘿 𝙔𝙊𝙐 𝙈𝙀𝘼𝙉 𝘼𝙉𝙔 𝙊𝙉𝙀 𝙏𝙃𝙀𝙎𝙀? 🤔",
+    zz1 = await zz.edit("<b>‼️ FILE NOT FOUND ? ‼️\n1️⃣ സിനിമയുടെ സ്പെല്ലിങ്ങ് ഗൂഗിളിൽ ഉള്ളത് പോലെ ആണോ നിങ്ങൾ അടിച്ചത് എന്ന് ഉറപ്പ് വരുത്തുക..!!\n2️⃣ നിങ്ങൾ ചോദിച്ച സിനിമ OTT റിലീസ് ആയതാണോ എന്ന് ചെക്ക് ചെയ്യുക..!!\n3️⃣ കറക്റ്റ് സ്പെല്ലിങ്ങ് അറിയാൻ "Search In Google" എന്ന ബട്ടണിൽ ക്ലിക്ക് ചെയ്യുക..!!</b>",
                     reply_markup=InlineKeyboardMarkup(btn))
-    await asyncio.sleep(17)
+    await asyncio.sleep(90)
     await zz1.delete()
 
 async def manual_filters(client, message, text=False):
