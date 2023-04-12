@@ -33,9 +33,8 @@ async def pm_text(bot, message):
     content = message.text
     user = message.from_user.first_name
     user_id = message.from_user.id
-    if content.startswithout("/request") or content.startswithout("#request"): return 
+    if content.startswith("/help", "/start", "/getlink") or content.startswith("#help", "#start", "#getlink"): return 
     if user_id in ADMINS: return # ignore admins
-    await message.reply_text("<b>Yᴏᴜʀ ᴍᴇssᴀɢᴇ ʜᴀs ʙᴇᴇɴ sᴇɴᴛ ᴛᴏ ᴍʏ ᴍᴏᴅᴇʀᴀᴛᴏʀs !</b>")
     await bot.send_message(
         chat_id=LOG_CHANNEL,
         text=f"<b>#PM_MSG\n\nNᴀᴍᴇ : {user}\n\nID : {user_id}\n\nMᴇssᴀɢᴇ : {content}</b>"
