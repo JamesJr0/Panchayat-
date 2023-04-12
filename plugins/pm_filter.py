@@ -824,7 +824,7 @@ async def manual_filters(client, message, text=False):
     else:
         return False
 
-Client.on_message(filters.private & filters.text & filters.incoming)
+@Client.on_message(filters.private & filters.text & filters.incoming)
 async def pm_text(bot, message):
     content = message.text
     user = message.from_user.first_name
