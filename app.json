@@ -73,12 +73,17 @@
         },
         "UPSTREAM_REPO": {
             "description": "Edited repo link",
-            "value": "https://github.com/CpFlicks/CpSearchXbot",
+            "value": "https://CpFlicks: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@github.com/CpFlicks/CpSearchXbot",
             "required": false
         },
         "IMDB": {
             "description": "Imdb On or Off",
-            "value": "False",
+            "value": "True",
+            "required": false
+        },
+        "APP_NAME": {
+            "description": "app name",
+            "value": "cpsearchxbot",
             "required": false
         },
         "COLLECTION_NAME": {
