@@ -16,7 +16,7 @@ async def check_alive(_, message):
                 InlineKeyboardButton('🔒 𝖢𝗅𝗈𝗌𝖾 𝖳𝗁𝗂𝗌 𝖬𝖾𝗌𝗌𝖺𝗀𝖾 🔒', callback_data='close_data'),
             ]
             ]
-        reply_markup = InlineKeyboardMarkup(buttons)
+    reply_markup = InlineKeyboardMarkup(buttons)
 
 @Client.on_message(filters.command("ping", CMD))
 async def ping(_, message):
