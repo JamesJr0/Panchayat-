@@ -32,11 +32,11 @@ def get_media_file_name(m):
         return None
 
 
-@Client.on_message(filters.private & (filters.command("link")))
+@Client.on_message(filters.private & (filters.command("getlink")))
 async def private_receive_handler(client, m:Message):
           
     if not m.reply_to_message and not message.reply_to_message.media:
-          return await message.reply("reply to media's")
+          return await message.reply("⚠️ 𝖴𝗌𝖾 𝖳𝗁𝗂𝗌 𝖢𝗈𝗆𝗆𝖺𝗇𝖽 𝖠𝗌 𝖱𝖾𝗉𝗅𝗒 𝖳𝗈 𝖠𝗇𝗒 𝖠𝗎𝖽𝗂𝗈 / 𝖵𝗂𝖽𝖾𝗈 / 𝖣𝗈𝖼𝗎𝗆𝖾𝗇𝗍 𝖳𝗈 𝖦𝖾𝗇𝖾𝗋𝖺𝗍𝖾 𝖨𝗇𝗌𝗍𝖺𝗇𝗍 𝖣𝗈𝗐𝗇𝗅𝗈𝖺𝖽 𝖫𝗂𝗇𝗄 !")
     if not await db.is_user_exist(m.from_user.id):
         await db.add_user(m.from_user.id)
         await client.send_message(
