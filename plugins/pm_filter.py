@@ -764,7 +764,7 @@ async def advantage_spell_chok(msg):
                 InlineKeyboardButton('🌿 Jᴏɪɴ Fᴏʀ Mᴏʀᴇ 🌿', url=f"{UPDATES_CHANNEL}")
             ]
             ]
-        reply_markup = InlineKeyboardMarkup(buttons)
+    reply_markup = InlineKeyboardMarkup(buttons)
         await asyncio.sleep(90)
         await k.delete()
         return
