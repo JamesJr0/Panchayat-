@@ -1,5 +1,6 @@
 import time
 import random
+from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from pyrogram import Client, filters
 
 CMD = ["/", "."]
