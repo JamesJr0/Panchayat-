@@ -759,15 +759,15 @@ async def advantage_spell_chok(msg):
     movielist = list(dict.fromkeys(movielist))  # removing duplicates
     if not movielist:
         k = await msg.reply("<b>‼️ FILE NOT FOUND  ‼️\n\n1️⃣ സിനിമയുടെ സ്പെല്ലിങ്ങ് ഗൂഗിളിൽ ഉള്ളത് പോലെ ആണോ നിങ്ങൾ അടിച്ചത് എന്ന് ഉറപ്പ് വരുത്തുക..!!\n\n2️⃣ നിങ്ങൾ ചോദിച്ച സിനിമ OTT റിലീസ് ആയതാണോ എന്ന് ചെക്ക് ചെയ്യുക..!!\n\n3️⃣ സ്പെല്ലിങ്ങ് അറിയാൻ 𝖲𝖾𝖺𝗋𝖼𝗁 𝖨𝗇 𝖦𝗈𝗈𝗀𝗅𝖾 എന്ന ബട്ടണിൽ ക്ലിക്ക് ചെയ്യുക..!!</b>")
-    buttons = [
+        buttons = [
             [
                 InlineKeyboardButton('🌿 Jᴏɪɴ Fᴏʀ Mᴏʀᴇ 🌿', url=f"{UPDATES_CHANNEL}")
             ]
             ]
-    reply_markup = InlineKeyboardMarkup(buttons)
-    await asyncio.sleep(90)
-    await k.delete()
-    return
+        reply_markup = InlineKeyboardMarkup(buttons)
+        await asyncio.sleep(90)
+        await k.delete()
+        return
 
 async def manual_filters(client, message, text=False):
     group_id = message.chat.id
