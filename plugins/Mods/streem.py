@@ -8,7 +8,7 @@ import urllib.parse
 from Lallus.database import Database
 from Lallus.human_readable import humanbytes
 from Lallus.vars import Var
-from info import BIN_CHANNEL, UPDATES_CHANNEL, SESSION_NAME
+from info import BIN_CHANNEL, UPDATE_CHANNEL, SESSION_NAME
 from pyrogram import filters, Client
 from pyrogram.errors import FloodWait, UserNotParticipant
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
@@ -45,7 +45,7 @@ async def private_receive_handler(client, m:Message):
         )
     if UPDATES_CHANNEL != "None":
         try:
-            user = await client.get_chat_member(UPDATES_CHANNEL, m.chat.id)
+            user = await client.get_chat_member(UPDATE_CHANNEL, m.chat.id)
             if user.status == "kicked":
                 await client.send_message(
                     chat_id=m.chat.id,
@@ -59,7 +59,7 @@ async def private_receive_handler(client, m:Message):
                 chat_id=m.chat.id,
                 text="""<i>Jᴏɪɴ ᴍʏ ᴜᴘᴅᴀᴛᴇ ᴄʜᴀɴɴᴇʟ ᴛᴏ ᴜꜱᴇ ᴍᴇ 🔐</i>""",
                 reply_markup=InlineKeyboardMarkup(
-                    [[ InlineKeyboardButton("Jᴏɪɴ ɴᴏᴡ 🔓", url=f"https://t.me/{Var.UPDATES_CHANNEL}") ]]
+                    [[ InlineKeyboardButton("Jᴏɪɴ ɴᴏᴡ 🔓", url=f"https://t.me/{Var.UPDATE_CHANNEL}") ]]
                 ),
                 parse_mode=ParseMode.HTML
             )
