@@ -1,4 +1,5 @@
-# (c) adarsh-goel
+
+
 import time
 import math
 import logging
