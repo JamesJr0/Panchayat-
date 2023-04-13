@@ -10,7 +10,7 @@ async def check_alive(_, message):
 
 @Client.on_message(filters.command("tutorial", CMD))
 async def check_tutorial(_, message):
-    await message.reply_text("<b>𝖶𝖺𝗍𝖼𝗁 𝖳𝗁𝗂𝗌 𝖳𝗎𝗍𝗈𝗋𝗂𝖺𝗅 𝖵𝗂𝖽𝖾𝗈 𝖳𝗈 𝖬𝖺𝗄𝖾 𝖬𝗒 𝖴𝗌𝖺𝗀𝖾 𝖤𝖺𝗌𝗂𝖾𝗋 𝖸𝗈𝗎 : <a href='https://graph.org/file/b62314386a3ebdc1ed890.mp4'>𝖢𝗅𝗂𝖼𝗄 𝖧𝖾𝗋𝖾 !</a></b>
+    await message.reply_text("<b>𝖶𝖺𝗍𝖼𝗁 𝖳𝗁𝗂𝗌 𝖳𝗎𝗍𝗈𝗋𝗂𝖺𝗅 𝖵𝗂𝖽𝖾𝗈 𝖳𝗈 𝖬𝖺𝗄𝖾 𝖬𝗒 𝖴𝗌𝖺𝗀𝖾 𝖤𝖺𝗌𝗂𝖾𝗋 𝖸𝗈𝗎 : <a href='https://graph.org/file/b62314386a3ebdc1ed890.mp4'>𝖢𝗅𝗂𝖼𝗄 𝖧𝖾𝗋𝖾 !</a></b>")
                           
 @Client.on_message(filters.command("ping", CMD))
 async def ping(_, message):
