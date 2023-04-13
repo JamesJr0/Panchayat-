@@ -396,6 +396,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
             except Exception as e:
                 logger.exception(e)
                 f_caption = f_caption
+                mention = mention
         if f_caption is None:
             f_caption = f"{title}"
             mention = f"{query.from_user.mention}"
