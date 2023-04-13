@@ -343,6 +343,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
             try:
                 f_caption = CUSTOM_FILE_CAPTION.format(file_name='' if title is None else title,
                                                        file_size='' if size is None else size,
+                                                       file_mention='' if mention is None else mention,
                                                        file_caption='' if f_caption is None else f_caption)
             except Exception as e:
                 logger.exception(e)
@@ -364,7 +365,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     file_id=file_id,
                     caption=f_caption,
                     reply_markup=InlineKeyboardMarkup( [ [ InlineKeyboardButton("⚡ ᴜᴘᴅᴀᴛᴇꜱ ⚡", url="https://t.me/cpflicks"),
-                                               InlineKeyboardButton("⚡ ɢʀᴏᴜᴘ ⚡", url="https://t.me/share/url?url=https://t.me/cpsearchxbot") ],
+                                               InlineKeyboardButton("⚡ ɢʀᴏᴜᴘ ⚡", url="https://t.me/+4r1zM9jH2HM2NWNl") ],
                                              [ InlineKeyboardButton("🌀 ꜱʜᴀʀᴇ ᴛʜɪꜱ ʙᴏᴛ 🌀", url="https://t.me/share/url?url=https://t.me/cpsearchxbot") ] ] ),
                     protect_content=True if ident == "filep" else False 
                 )
@@ -392,6 +393,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
             try:
                 f_caption = CUSTOM_FILE_CAPTION.format(file_name='' if title is None else title,
                                                        file_size='' if size is None else size,
+                                                       file_mention='' if mention is None else mention,
                                                        file_caption='' if f_caption is None else f_caption)
             except Exception as e:
                 logger.exception(e)
@@ -437,7 +439,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
     elif query.data == "about":
         buttons = [[
             InlineKeyboardButton('ᴜᴘᴅᴀᴛᴇs', url=f"{UPDATES_CHANNEL}"),
-            InlineKeyboardButton('ꜱᴜᴘᴘᴏʀᴛ', url='https://t.me/DKBOTxCHATS'),
+            InlineKeyboardButton('ꜱᴜᴘᴘᴏʀᴛ', url='https://t.me/+4r1zM9jH2HM2NWNl'),
             InlineKeyboardButton('ʙᴀᴄᴋ', callback_data='start')
         ]]
         reply_markup = InlineKeyboardMarkup(buttons)
