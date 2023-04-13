@@ -366,7 +366,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     caption=f_caption,
                     reply_markup=InlineKeyboardMarkup( [ [ InlineKeyboardButton("⚡ ᴜᴘᴅᴀᴛᴇꜱ ⚡", url="https://t.me/cpflicks"),
                                                InlineKeyboardButton("⚡ ɢʀᴏᴜᴘ ⚡", url="https://t.me/+4r1zM9jH2HM2NWNl") ],
-                                             [ InlineKeyboardButton("🔒 𝖢𝗅𝗈𝗌𝖾 𝖳𝗁𝗂𝗌 𝖬𝖾𝗌𝗌𝖺𝗀𝖾 🔒", callback_data='close_data') ] ] ),
+                                             [ InlineKeyboardButton('🔎 Sᴇᴀʀᴄʜ Iɴʟɪɴᴇ 🔍', switch_inline_query_current_chat=query) ] ] ),
                     protect_content=True if ident == "filep" else False 
                 )
                 await query.answer('𝖨 𝖧𝖺𝗏𝖾 𝖲𝖾𝗇𝗍 𝖸𝗈𝗎 𝖥𝗂𝗅𝖾𝗌...', show_alert=False)
