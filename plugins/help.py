@@ -20,7 +20,6 @@ async def help(client, message):
     
     await message.reply_photo(
         photo=(ADD_PIC),
-        chat_id=message.chat.id,
         text=HELP_TXT,
         reply_markup=reply_markup,
         parse_mode=enums.ParseMode.HTML,
