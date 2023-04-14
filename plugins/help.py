@@ -11,7 +11,7 @@ HELP_TXT = """<b>Bro, Check Movie Name In #Google and Try ! Then No Results Add 
 @Client.on_message(filters.command(["help"]) & filters.private, group=1)
 async def help(client, message):
     buttons = [[
-            InlineKeyboardButton('Start', callback_data='start'),
+            InlineKeyboardButton("🔒 𝖢𝗅𝗈𝗌𝖾 𝖳𝗁𝗂𝗌 𝖬𝖾𝗌𝗌𝖺𝗀𝖾 🔒", callback_data='close_data'),
         ]]
     
     reply_markup = InlineKeyboardMarkup(buttons)
