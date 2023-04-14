@@ -739,7 +739,7 @@ async def advantage_spell_chok(msg):
     if not g_s:
         btn = [[
             InlineKeyboardButton('🔍 ɢᴏᴏɢʟᴇ 🔎', url=f'https://google.com/search?q='),
-            InlineKeyboardButton(' 🔍 ʏᴀɴᴅᴇx 🔎', url=f'https://yandex.com/search?text=')
+            InlineKeyboardButton('🔍  ɪᴍᴅʙ  🔎', url=f'https://www.imdb.com/search?=')
         ],[
             InlineKeyboardButton("🔒 𝖢𝗅𝗈𝗌𝖾 𝖳𝗁𝗂𝗌 𝖬𝖾𝗌𝗌𝖺𝗀𝖾 🔒", callback_data="close_data")
         ]]           
@@ -774,7 +774,7 @@ async def advantage_spell_chok(msg):
     if not movielist:
         btn = [[
             InlineKeyboardButton('🔍 ɢᴏᴏɢʟᴇ 🔎', url=f'https://google.com/search?q='),
-            InlineKeyboardButton(' 🔍 ʏᴀɴᴅᴇx 🔎', url=f'https://yandex.com/search?text=')
+            InlineKeyboardButton('🔍  ɪᴍᴅʙ  🔎', url=f'https://www.imdb.com/search?=')
         ],[
             InlineKeyboardButton("🔒 𝖢𝗅𝗈𝗌𝖾 𝖳𝗁𝗂𝗌 𝖬𝖾𝗌𝗌𝖺𝗀𝖾 🔒", callback_data="close_data")
         ]]           
@@ -786,7 +786,7 @@ async def advantage_spell_chok(msg):
     SPELL_CHECK[msg.message_id] = movielist
     btn = [[
         InlineKeyboardButton('🔍 ɢᴏᴏɢʟᴇ 🔎', url=f'https://google.com/search?q='),
-        InlineKeyboardButton(' 🔍 ʏᴀɴᴅᴇx 🔎', url=f'https://yandex.com/search?text=')
+        InlineKeyboardButton('🔍  ɪᴍᴅʙ  🔎', url=f'https://www.imdb.com/search?=')
     ],[
         InlineKeyboardButton("🔒 𝖢𝗅𝗈𝗌𝖾 𝖳𝗁𝗂𝗌 𝖬𝖾𝗌𝗌𝖺𝗀𝖾 🔒", callback_data="close_data")
     ]]
