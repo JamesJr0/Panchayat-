@@ -18,9 +18,9 @@ async def help(client, message):
     
     reply_markup = InlineKeyboardMarkup(buttons)
     
-    await client.send_photo(
+    await message.reply_photo(
+        photo=(ADD_PIC),
         chat_id=message.chat.id,
-        photo=f"{random.choice(ADD_PIC)}",
         text=HELP_TXT,
         reply_markup=reply_markup,
         parse_mode=enums.ParseMode.HTML,
