@@ -738,8 +738,8 @@ async def advantage_spell_chok(msg):
     gs_parsed = []
     if not g_s:
         btn = [[
-            InlineKeyboardButton('🔍 ɢᴏᴏɢʟᴇ 🔎', url=f'https://google.com/search?q={search}'),
-            InlineKeyboardButton('🔍  ɪᴍᴅʙ  🔎', url=f'https://www.imdb.com/search?={search}')
+            InlineKeyboardButton('🔍 ɢᴏᴏɢʟᴇ 🔎', url=f'https://google.com/search?q={g_s}'),
+            InlineKeyboardButton('🔍  ɪᴍᴅʙ  🔎', url=f'https://www.imdb.com/search?={g_s}')
         ],[
             InlineKeyboardButton("🔒 𝖢𝗅𝗈𝗌𝖾 𝖳𝗁𝗂𝗌 𝖬𝖾𝗌𝗌𝖺𝗀𝖾 🔒", callback_data="close_data")
         ]]           
@@ -773,8 +773,8 @@ async def advantage_spell_chok(msg):
     movielist = list(dict.fromkeys(movielist))  # removing duplicates
     if not movielist:
         btn = [[
-            InlineKeyboardButton('🔍 ɢᴏᴏɢʟᴇ 🔎', url=f'https://google.com/search?q={search}'),
-            InlineKeyboardButton('🔍  ɪᴍᴅʙ  🔎', url=f'https://www.imdb.com/search?={search}')
+            InlineKeyboardButton('🔍 ɢᴏᴏɢʟᴇ 🔎', url=f'https://google.com/search?q={g_s}'),
+            InlineKeyboardButton('🔍  ɪᴍᴅʙ  🔎', url=f'https://www.imdb.com/search?={g_s}')
         ],[
             InlineKeyboardButton("🔒 𝖢𝗅𝗈𝗌𝖾 𝖳𝗁𝗂𝗌 𝖬𝖾𝗌𝗌𝖺𝗀𝖾 🔒", callback_data="close_data")
         ]]           
@@ -785,8 +785,8 @@ async def advantage_spell_chok(msg):
 
     SPELL_CHECK[msg.message_id] = movielist
     btn = [[
-        InlineKeyboardButton('🔍 ɢᴏᴏɢʟᴇ 🔎', url=f'https://google.com/search?q={search}'),
-        InlineKeyboardButton('🔍  ɪᴍᴅʙ  🔎', url=f'https://www.imdb.com/search?={search}')
+        InlineKeyboardButton('🔍 ɢᴏᴏɢʟᴇ 🔎', url=f'https://google.com/search?q={g_s}'),
+        InlineKeyboardButton('🔍  ɪᴍᴅʙ  🔎', url=f'https://www.imdb.com/search?={g_s}')
     ],[
         InlineKeyboardButton("🔒 𝖢𝗅𝗈𝗌𝖾 𝖳𝗁𝗂𝗌 𝖬𝖾𝗌𝗌𝖺𝗀𝖾 🔒", callback_data="close_data")
     ]]
