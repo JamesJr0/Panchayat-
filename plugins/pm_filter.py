@@ -783,7 +783,7 @@ async def advantage_spell_chok(msg):
         await k.delete()
         return
 
-    SPELL_CHECK[msg.message_id] = movielist
+    SPELL_CHECK[msg.id] = movielist
     btn = [[
         InlineKeyboardButton('🔍 ɢᴏᴏɢʟᴇ 🔎', url=f'https://google.com/search?q='),
         InlineKeyboardButton('🔍  ɪᴍᴅʙ  🔎', url=f'https://www.imdb.com/search?=')
