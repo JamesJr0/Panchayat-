@@ -75,7 +75,7 @@ async def answer(bot, query):
                 reply_markup=reply_markup))
 
     if results:
-        switch_pm_text = f"{emoji.FILE_FOLDER} Search Cp Database"
+        switch_pm_text = f"Search Cp Database"
         if string:
             switch_pm_text += f" for {string}"
         try:
@@ -90,7 +90,7 @@ async def answer(bot, query):
         except Exception as e:
             logging.exception(str(e))
     else:
-        switch_pm_text = f'{emoji.CROSS_MARK} File Not Found'
+        switch_pm_text = f'File Not Found'
         if string:
             switch_pm_text += f' for "{string}"'
 
