@@ -9,3 +9,7 @@ bs4
 cinemagoer
 aiohttp
 python-dotenv
+ffmpeg
+hachoir
+
+
