@@ -73,7 +73,7 @@
         },
         "UPSTREAM_REPO": {
             "description": "Edited repo link",
-            "value": "https://CpFlicks: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@github.com/CpFlicks/CpSearchXbot",
+            "value": "https://CpFlicks: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@github.com/CpFlicks/CpSearchXbot",
             "required": false
         },
         "IMDB": {
