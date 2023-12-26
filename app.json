@@ -63,7 +63,7 @@
         },
         "DATABASE_URI": {
             "description": "mongoDB URI. Get this value from https://www.mongodb.com. For more help watch this video - https://youtu.be/dsuTn4qV2GA",
-            "value": "mongodb+srv://CpSearchXbot:CpSearchXbot@cluster0.7zbkkqt.mongodb.net/?retryWrites=true&w=majority",
+            "value": "mongodb+srv://FileToLink:FileToLink@cluster0.b2dtvug.mongodb.net/?retryWrites=true&w=majority",
             "required": true
         },
         "DATABASE_NAME": {
