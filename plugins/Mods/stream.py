@@ -47,7 +47,7 @@ async def private_receive_handler(client, m:Message):
         log_msg = await m.reply_to_message.forward(chat_id=BIN_CHANNEL)
         file_name = get_media_file_name(m.reply_to_message)
         file_size = humanbytes(get_media_file_size(m.reply_to_message))
-        stream_link = f"{Var.URL}watch/{str(log_msg.id)}/{quote_plus(get_name(log_msg))}?hash={get_hash(log_msg)}
+        stream_link = f"{Var.URL}watch/{str(log_msg.id)}/{quote_plus(get_name(log_msg))}?hash={get_hash(log_msg)}"
 
         msg_text ="""
 <i><u>🔗 Yᴏᴜʀ Dᴏᴡɴʟᴏᴀᴅ Lɪɴᴋ Gᴇɴᴇʀᴀᴛᴇᴅ 😜</u></i>\n
