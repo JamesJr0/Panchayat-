@@ -1,8 +1,3 @@
-#created by @lallu_tg
-#use with proper credits
-
-
-
 import asyncio
 import urllib.parse
 from Lallus.database import Database
