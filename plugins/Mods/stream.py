@@ -26,7 +26,26 @@ def get_media_file_name(m):
     else:
         return None
 
+def get_media_from_message(message: "Message") -> Any:
+    media_types = (
+        "audio",
+        "document",
+        "photo",
+        "sticker",
+        "animation",
+        "video",
+        "voice",
+        "video_note",
+    )
+    for attr in media_types:
+        media = getattr(message, attr, None)
+        if media:
+            return media
 
+def get_hash(media_msg: Message) -> str:
+    media = get_media_from_message(media_msg)
+    return getattr(media, "file_unique_id", "")[:6]
+    
 @Client.on_message(filters.private & (filters.command("getlink")))
 async def private_receive_handler(client, m:Message):
           
@@ -42,11 +61,12 @@ async def private_receive_handler(client, m:Message):
         log_msg = await m.reply_to_message.forward(chat_id=BIN_CHANNEL)
         file_name = get_media_file_name(m.reply_to_message)
         file_size = humanbytes(get_media_file_size(m.reply_to_message))
-        stream_link = "https://{}/{}/{}".format(Var.FQDN, log_msg.id, file_name) if Var.ON_HEROKU or Var.NO_PORT else \
-            "http://{}:{}/{}/{}".format(Var.FQDN,
+        stream_link = "https://{}/{}/{}?hash={}".format(Var.FQDN, log_msg.id, file_name, get_hash(log_msg))if Var.ON_HEROKU or Var.NO_PORT else \
+            "http://{}:{}/{}/{}?hash={}".format(Var.FQDN,
                                     Var.PORT,
-                                    log_msg.id,
-                                    file_name)
+                                    log_msg.id,                                                
+                                    file_name,
+                                    get_hash(log_msg))
 
         msg_text ="""
 <i><u>🔗 Yᴏᴜʀ Dᴏᴡɴʟᴏᴀᴅ Lɪɴᴋ Gᴇɴᴇʀᴀᴛᴇᴅ 😜</u></i>\n
