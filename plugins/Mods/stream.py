@@ -5,6 +5,7 @@ from Lallus.human_readable import humanbytes
 from Lallus.vars import Var
 from info import BIN_CHANNEL, UPDATES_CHANNEL, SESSION_NAME
 from pyrogram import filters, Client
+from typing import Any, Optional
 from pyrogram.errors import FloodWait, UserNotParticipant
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.enums.parse_mode import ParseMode
