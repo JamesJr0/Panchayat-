@@ -24,7 +24,7 @@ BOT_TOKEN = environ.get('BOT_TOKEN', '6960947964:AAH9r6Sch96KcakHiSUE0VvSQoCKbsJ
 # Bot settings
 CACHE_TIME = int(environ.get('CACHE_TIME', 300))
 USE_CAPTION_FILTER = bool(environ.get('USE_CAPTION_FILTER', False))
-PICS = (environ.get('PICS', 'https://graph.org/file/7a35f90b06683a98f694d.jpg https://graph.org/file/2ee759b89277cdc46fad0.jpg')).split()
+PICS = (environ.get('PICS', 'https://graph.org/file/b7bfe0352ba19d3c0d21d.jpg')).split()
 UPDATE_CHANNEL = int(environ. get('UPDATE_CHANNEL', ''))
 
 # Admins, Channels & Users
@@ -68,7 +68,7 @@ UPDATES_CHANNEL = environ.get('UPDATES_CHANNEL', "t.me/CpFlicks")
 PROTECT_CONTENT = is_enabled((environ.get('PROTECT_CONTENT', "False")), False)
 PUBLIC_FILE_STORE = is_enabled((environ.get('PUBLIC_FILE_STORE', "False")), False)
 DELETE_TIME = int(environ.get('DELETE_TIME', 160))
-START_IMAGE_URL = environ.get('START_IMAGE_URL', "https://graph.org/file/7a35f90b06683a98f694d.jpg")
+START_IMAGE_URL = environ.get('START_IMAGE_URL', "https://graph.org/file/b7bfe0352ba19d3c0d21d.jpg")
 
 #Session Name
 SESSION_NAME = str(getenv('SESSION_NAME', 'prosearchfather'))
