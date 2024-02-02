@@ -16,9 +16,9 @@ def is_enabled(value, default):
 
 # Bot information
 SESSION = environ.get('SESSION', 'Media_search')
-API_ID = int(environ.get('API_ID', '13666216'))
-API_HASH = environ.get('API_HASH', 'f3a456b486290011638fb4b312f9be70')
-BOT_TOKEN = environ.get('BOT_TOKEN', '6286912235:AAFNcArRZGC4WvCUoVCjeow0eUXnYgRp99w')
+API_ID = int(environ.get('API_ID', '543598'))
+API_HASH = environ.get('API_HASH', '293325819bb390ea1d2c3d823fa8e9fa')
+BOT_TOKEN = environ.get('BOT_TOKEN', '6960947964:AAH9r6Sch96KcakHiSUE0VvSQoCKbsJLhOM')
 
 
 # Bot settings
@@ -36,9 +36,9 @@ auth_grp = environ.get('AUTH_GROUP')
 AUTH_GROUPS = [int(ch) for ch in auth_grp.split()] if auth_grp else None
 
 # MongoDB information
-DATABASE_URI = environ.get('DATABASE_URI', "mongodb+srv://CpFlicks:CpFlicks@cluster0.4b8hqan.mongodb.net/?retryWrites=true&w=majority")
-DATABASE_NAME = environ.get('DATABASE_NAME', "Cluster0")
-COLLECTION_NAME = environ.get('COLLECTION_NAME', 'Telegram_files')
+DATABASE_URI = environ.get('DATABASE_URI', "mongodb+srv://shibu:iCcuN8t4huNvi4Qy@suzzy.jnxmryf.mongodb.net/?retryWrites=true&w=majority")
+DATABASE_NAME = environ.get('DATABASE_NAME', "shibhukabot")
+COLLECTION_NAME = environ.get('COLLECTION_NAME', 'shibubot')
 
 # FSUB
 auth_channel = environ.get('AUTH_CHANNEL')
@@ -49,8 +49,8 @@ REQ_CHANNEL = int(False) if REQ_CHANNEL and id_pattern.search(False) else False
 JOIN_REQS_DB = environ.get("JOIN_REQS_DB", DATABASE_URI)
 
 # Others
-BIN_CHANNEL = int(environ. get('BIN_CHANNEL',-1001868526243))
-LOG_CHANNEL = int(environ.get('LOG_CHANNEL', -1001981156342))
+BIN_CHANNEL = int(environ. get('BIN_CHANNEL',-1002130571317))
+LOG_CHANNEL = int(environ.get('LOG_CHANNEL', -1002130571317))
 SUPPORT_CHAT = environ.get('SUPPORT_CHAT', 'DKBOTxCHATS')
 P_TTI_SHOW_OFF = is_enabled((environ.get('P_TTI_SHOW_OFF', "False")), False)
 IMDB = is_enabled((environ.get('IMDB', "True")), True)
@@ -67,11 +67,11 @@ MELCOW_NEW_USERS = is_enabled((environ.get('MELCOW_NEW_USERS', "True")), True)
 UPDATES_CHANNEL = environ.get('UPDATES_CHANNEL', "t.me/CpFlicks")
 PROTECT_CONTENT = is_enabled((environ.get('PROTECT_CONTENT', "False")), False)
 PUBLIC_FILE_STORE = is_enabled((environ.get('PUBLIC_FILE_STORE', "False")), False)
-DELETE_TIME = int(environ.get('DELETE_TIME', 300))
+DELETE_TIME = int(environ.get('DELETE_TIME', 160))
 START_IMAGE_URL = environ.get('START_IMAGE_URL', "https://graph.org/file/7a35f90b06683a98f694d.jpg")
 
 #Session Name
-SESSION_NAME = str(getenv('SESSION_NAME', 'cpsearchxbot'))
+SESSION_NAME = str(getenv('SESSION_NAME', 'prosearchfather'))
 
 LOG_STR = "Current Cusomized Configurations are:-\n"
 LOG_STR += ("IMDB Results are enabled, Bot will be showing imdb details for you queries.\n" if IMDB else "IMBD Results are disabled.\n")
