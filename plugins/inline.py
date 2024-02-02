@@ -75,7 +75,7 @@ async def answer(bot, query):
                 reply_markup=reply_markup))
 
     if results:
-        switch_pm_text = f"Search Cp Database"
+        switch_pm_text = f"Search ProSearch Database"
         if string:
             switch_pm_text += f" for {string}"
         try:
