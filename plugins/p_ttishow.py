@@ -38,18 +38,18 @@ async def save_group(bot, message):
             return
         buttons = [[
             InlineKeyboardButton('ʜᴇʟᴘ', url=f"https://t.me/{temp.U_NAME}?start=help"),
-            InlineKeyboardButton('ᴜᴘᴅᴀᴛᴇs', url='https://t.me/dk_botx')
+            InlineKeyboardButton('ᴜᴘᴅᴀᴛᴇs', url='https://t.me/ProSearchFather')
         ]]
         reply_markup=InlineKeyboardMarkup(buttons)
         await message.reply_text(
-                        text=f"<b>Thankyou For Adding Me In {message.chat.title} ❣️</b>",
+                        text=f"<b> ⚠️ You can't Use @ProSearchFatherBot in Groups for Searching Movies/Series!\n\nYou Can Use @Bae_Suzzy_Bot for Searching Files in Groups Easily, @ProSearchFatherBot is Specially Designed For PM Search..\n\n Team @ProSearchFather !</b>",
             reply_markup=reply_markup)
     else:
         settings = await get_settings(message.chat.id)
         if settings["welcome"]:
             for u in message.new_chat_members:
                 buttons = [[
-                InlineKeyboardButton('🍂 Jᴏɪɴ Fᴏʀ Mᴏʀᴇ 🍂', url="https://t.me/AbOutMe_DK")
+                InlineKeyboardButton('🍂 Jᴏɪɴ Fᴏʀ Mᴏʀᴇ 🍂', url="https://t.me/ProSearchFather")
             ]]
                 if (temp.MELCOW).get('welcome') is not None:
                     try:
@@ -143,9 +143,9 @@ async def re_enable_chat(bot, message):
     await message.reply("Chat Successfully re-enabled")
 
 
-@Client.on_message(filters.command('spideydb') & filters.incoming & filters.user(ADMINS))
+@Client.on_message(filters.command('status') & filters.incoming & filters.user(ADMINS))
 async def get_ststs(bot, message):
-    rju = await message.reply('Fetching Cp Database stats..')
+    rju = await message.reply('Fetching Pro Search DataBase..')
     total_users = await db.total_users_count()
     totl_chats = await db.total_chat_count()
     files = await Media.count_documents()
