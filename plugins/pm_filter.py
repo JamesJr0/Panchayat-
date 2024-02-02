@@ -34,7 +34,17 @@ async def give_filter(client, message):
     k = await manual_filters(client, message)
     if k == False:
         await auto_filter(client, message)
-
+        
+@Client.on_message(filters.group & filters.text & filters.incoming)
+async def grp_text(bot, message):
+    content = message.text
+    user = message.from_user.first_name
+    user_id = message.from_user.id
+    if content.startswith("/") or content.startswith("#"): return  # ignore commands and hashtags
+    if user_id in ADMINS: return # ignore admins
+    await message.reply_text("<b> ⚠️ You can't Use @ProSearchFatherBot in Groups for Searching Movies/Series!\n\nYou Can Use @Bae_Suzzy_Bot for Searching Files in Groups Easily, @ProSearchFatherBot is Specially Designed For PM Search..\n\n Team @ProSearchFather !</b>")
+)
+    
 @Client.on_callback_query(filters.regex(r"^next"))
 async def next_page(bot, query):
     ident, req, key, offset = query.data.split("_")
@@ -364,8 +374,8 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     chat_id=query.from_user.id,
                     file_id=file_id,
                     caption=f_caption,
-                    reply_markup=InlineKeyboardMarkup( [ [ InlineKeyboardButton("⚡ ᴜᴘᴅᴀᴛᴇꜱ ⚡", url="https://t.me/cpflicks"),
-                                               InlineKeyboardButton("⚡ ɢʀᴏᴜᴘ ⚡", url="https://t.me/+4r1zM9jH2HM2NWNl") ],
+                    reply_markup=InlineKeyboardMarkup( [ [ InlineKeyboardButton("⚡ ᴜᴘᴅᴀᴛᴇꜱ ⚡", url="https://t.me/ProSearchFather"),
+                                               InlineKeyboardButton("⚡ ɢʀᴏᴜᴘ ⚡", url="https://t.me/+iqUWSdGIMOw3NGM1") ],
                                              [ InlineKeyboardButton('🔎 Sᴇᴀʀᴄʜ Iɴʟɪɴᴇ 🔍', switch_inline_query_current_chat = '') ] ] ),
                     protect_content=True if ident == "filep" else False 
                 )
@@ -438,7 +448,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
         )
     elif query.data == "about":
         buttons = [[
-            InlineKeyboardButton('ᴜᴘᴅᴀᴛᴇs', url=f"{UPDATES_CHANNEL}"),
+            InlineKeyboardButton('ᴜᴘᴅᴀᴛᴇs', url='https://t.me/ProSearchFather'),
             InlineKeyboardButton('ꜱᴜᴘᴘᴏʀᴛ', url='https://t.me/+4r1zM9jH2HM2NWNl'),
             InlineKeyboardButton('ʙᴀᴄᴋ', callback_data='start')
         ]]
@@ -709,7 +719,7 @@ async def auto_filter(client, msg, spoll=False):
         cap = f"<b>Hai 👋 {message.from_user.mention}</b> 😍\n\n<b>📁 Found ✨  Files For Your Query : #{search} 👇</b>"
     if imdb and imdb.get('poster'):
         try:
-            fmsg = await message.reply_photo('https://telegra.ph/file/5a00bd4b0d6ce1d2092db.jpg', caption=cap[:1024],
+            fmsg = await message.reply_photo('https://graph.org/file/b7bfe0352ba19d3c0d21d.jpg', caption=cap[:1024],
                                       reply_markup=InlineKeyboardMarkup(btn))
         except (MediaEmpty, PhotoInvalidDimensions, WebpageMediaEmpty):
             pic = imdb.get('poster')
