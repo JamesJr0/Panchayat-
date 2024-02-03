@@ -8,7 +8,7 @@ from Script import script
 import pyrogram
 from database.connections_mdb import active_connection, all_connections, delete_connection, if_active, make_active, \
     make_inactive
-from info import ADMINS, AUTH_CHANNEL, AUTH_USERS, CUSTOM_FILE_CAPTION, LOG_CHANNEL, UPDATES_CHANNEL, DELETE_TIME, REQ_CHANNEL
+from info import ADMINS, AUTH_CHANNEL, AUTH_USERS, CUSTOM_FILE_CAPTION, LOG_CHANNEL, UPDATES_CHANNEL, DELETE_TIME, REQ_CHANNEL, MOVIE_GROUP
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 from pyrogram import Client, filters, enums
 from pyrogram.errors import FloodWait, UserIsBlocked, MessageNotModified, PeerIdInvalid
@@ -377,8 +377,8 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     chat_id=query.from_user.id,
                     file_id=file_id,
                     caption=f_caption,
-                    reply_markup=InlineKeyboardMarkup( [ [ InlineKeyboardButton("⚡ ᴜᴘᴅᴀᴛᴇꜱ ⚡", url="https://t.me/ProSearchFather"),
-                                               InlineKeyboardButton("⚡ ɢʀᴏᴜᴘ ⚡", url="https://t.me/+iqUWSdGIMOw3NGM1") ],
+                    reply_markup=InlineKeyboardMarkup( [ [ InlineKeyboardButton("⚡ ᴜᴘᴅᴀᴛᴇꜱ ⚡", url=f"{UPDATES_CHANNEL}"),
+                                               InlineKeyboardButton("⚡ ɢʀᴏᴜᴘ ⚡", url=f"{MOVIE_GROUP}") ],
                                              [ InlineKeyboardButton('🔎 Sᴇᴀʀᴄʜ Iɴʟɪɴᴇ 🔍', switch_inline_query_current_chat = '') ] ] ),
                     protect_content=True if ident == "filep" else False 
                 )
