@@ -23,7 +23,7 @@ async def help(client, message):
         reply_to_message_id=message.id
     )
 
-@Client.on_message(filters.private | filters.group)
+@Client.on_message(filters.group)
 async def grp(client, message):
     buttons = [[
             InlineKeyboardButton("➕ ᴀᴅᴅ ᴏᴜʀ ʙᴏᴛ ᴛᴏ ᴛʜɪꜱ ɢʀᴏᴜᴘ ➕", url='http://t.me/Bae_Suzzy_Bot?startgroup=true'),
