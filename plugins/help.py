@@ -22,7 +22,23 @@ async def help(client, message):
         parse_mode=enums.ParseMode.HTML,
         reply_to_message_id=message.id
     )
-
+    
+@Client.on_message(filters.command(["tutorial"]) & filters.private, group=1)
+async def tutorial(client, message):
+    buttons = [[
+            InlineKeyboardButton("🔒 𝖢𝗅𝗈𝗌𝖾 𝖳𝗁𝗂𝗌 𝖬𝖾𝗌𝗌𝖺𝗀𝖾 🔒", callback_data='close_data'),
+        ]]
+    
+    reply_markup = InlineKeyboardMarkup(buttons)
+    
+    await message.reply_video(
+        video="http://graph.org/file/1802f90277bae20e9bc13.mp4",
+        caption="<b>𝖶𝖺𝗍𝖼𝗁 𝖳𝗁𝗂𝗌 𝖳𝗎𝗍𝗈𝗋𝗂𝖺𝗅 𝖵𝗂𝖽𝖾𝗈 𝖳𝗈 𝖬𝖺𝗄𝖾 𝖬𝗒 𝖴𝗌𝖺𝗀𝖾 𝖤𝖺𝗌𝗂𝖾𝗋 𝖳𝗈 𝖸𝗈𝗎.\n\n𝖳𝖾𝖺𝗆 @ProSearchFather .</b>",
+        reply_markup=reply_markup,
+        parse_mode=enums.ParseMode.HTML,
+        reply_to_message_id=message.id
+    )
+    
 @Client.on_message(filters.group)
 async def grp(client, message):
     buttons = [[
@@ -39,10 +55,6 @@ async def grp(client, message):
         reply_to_message_id=message.id
     )
     
-@Client.on_message(filters.command("tutorial", CMD))
-async def check_tutorial(_, message):
-    await message.reply_text("<b>𝖶𝖺𝗍𝖼𝗁 𝖳𝗁𝗂𝗌 𝖳𝗎𝗍𝗈𝗋𝗂𝖺𝗅 𝖵𝗂𝖽𝖾𝗈 𝖳𝗈 𝖬𝖺𝗄𝖾 𝖬𝗒 𝖴𝗌𝖺𝗀𝖾 𝖤𝖺𝗌𝗂𝖾𝗋 𝖳𝗈 𝖸𝗈𝗎 : <a href='http://graph.org/file/1802f90277bae20e9bc13.mp4'>𝖢𝗅𝗂𝖼𝗄 𝖧𝖾𝗋𝖾 !</a></b>")
-
 @Client.on_message(filters.command("about", CMD))
 async def check_about(_, message):
     await message.reply_text("<b>@ProSearchFather is a Movie / Series Searching Telegram Project!\n\nThanks to all who made efforts to build this project.</b>")
