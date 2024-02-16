@@ -47,7 +47,7 @@ def get_hash(media_msg: Message) -> str:
     media = get_media_from_message(media_msg)
     return getattr(media, "file_unique_id", "")[:6]
     
-@Client.on_message(filters.private & (filters.command("getlink")))
+#@Client.on_message(filters.private & (filters.command("getlink")))
 async def private_receive_handler(client, m:Message):
           
     if not m.reply_to_message and not m.reply_to_message.media:
