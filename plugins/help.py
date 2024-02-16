@@ -1,5 +1,6 @@
 import time
 import random
+from pyrogram.types import Message
 from pyrogram import Client, filters, enums
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 
@@ -40,7 +41,7 @@ async def tutorial(client, message):
     )
     
 @Client.on_message(filters.group & filters.incoming)
-async def grp(client, message):
+async def grp(_,message: Message):
     buttons = [[
             InlineKeyboardButton("➕ ᴀᴅᴅ ᴏᴜʀ ʙᴏᴛ ᴛᴏ ᴛʜɪꜱ ɢʀᴏᴜᴘ ➕", url='http://t.me/Bae_Suzzy_Bot?startgroup=true'),
         ]]
