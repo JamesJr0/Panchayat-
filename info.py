@@ -48,12 +48,6 @@ REQ_CHANNEL = environ.get("REQ_CHANNEL", False)
 REQ_CHANNEL = int(REQ_CHANNEL) if REQ_CHANNEL and id_pattern.search(REQ_CHANNEL) else False
 JOIN_REQS_DB = environ.get("JOIN_REQS_DB", DATABASE_URI)
 
-# CHANNELS LIST KEYS
-UPDATES_CHANNEL = environ.get('UPDATES_CHANNEL', "https://t.me/+6guhTe_AHh44ODY1")
-MOVIE_GROUP = environ.get('MOVIE_GROUP', "https://t.me/+FTt3LaNOvYk1ZWY1")
-LATEST_UPLOADS = environ.get('LATEST_UPLOADS', "https://t.me/+-a7Vk8PDrCtiYTA9")
-MOVIE_BOT = environ.get('MOVIE_BOT', "http://t.me/bae_suzzy_bot?start=help")
-
 # Others
 BIN_CHANNEL = int(environ. get('BIN_CHANNEL', '-1002130571317'))
 LOG_CHANNEL = int(environ.get('LOG_CHANNEL', '-1002130571317'))
@@ -70,6 +64,8 @@ MAX_LIST_ELM = environ.get("MAX_LIST_ELM", None)
 INDEX_REQ_CHANNEL = int(environ.get('INDEX_REQ_CHANNEL', LOG_CHANNEL))
 FILE_STORE_CHANNEL = [int(ch) for ch in (environ.get('FILE_STORE_CHANNEL', '')).split()]
 MELCOW_NEW_USERS = is_enabled((environ.get('MELCOW_NEW_USERS', "True")), True)
+UPDATES_CHANNEL = environ.get('UPDATES_CHANNEL', "https://t.me/ProsearchFather")
+MOVIE_GROUP = environ.get('MOVIE_GROUP', "https://t.me/Prosearchfatherbot")
 PROTECT_CONTENT = is_enabled((environ.get('PROTECT_CONTENT', "False")), False)
 PUBLIC_FILE_STORE = is_enabled((environ.get('PUBLIC_FILE_STORE', "False")), False)
 DELETE_TIME = int(environ.get('DELETE_TIME', 160))
