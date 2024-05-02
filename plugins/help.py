@@ -26,7 +26,7 @@ links_btn = [
 ]
 
 @Client.on_message(filters.command(["links"]) & filters.private, group=1)
-async def linkslist(client, message):
+async def links(client, message):
     await message.reply_photo(
         photo = "http://graph.org/file/8270c1de86b6a36255eaf.jpg",
         text = LINKS_TXT,
