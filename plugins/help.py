@@ -1,7 +1,6 @@
 import time
 import random
 from pyrogram.types import Message
-from Script import script
 from pyrogram import Client, filters, enums
 from info import UPDATES_CHANNEL, LATEST_UPLOADS, MOVIE_GROUP, MOVIE_BOT
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
@@ -28,10 +27,10 @@ links_btn = [
 @Client.on_message(filters.command(["links"]) & filters.private, group=1)
 async def links(client, message):
     await message.reply_photo(
-        photo = "http://graph.org/file/8270c1de86b6a36255eaf.jpg",
-        text = LINKS_TXT,
-        quote = True,
-        reply_markup = InlineKeyboardMarkup(links_btn)
+        photo="http://graph.org/file/8270c1de86b6a36255eaf.jpg",
+        text="<b>🔗 𝖢𝗁𝖾𝖼𝗄 𝖮𝗎𝗍 𝖠𝗅𝗅 𝖮𝗎𝗋 𝖫𝗂𝗇𝗄𝗌 𝖥𝗋𝗈𝗆 𝗍𝗁𝖾 𝖡𝗎𝗍𝗍𝗈𝗇𝗌 𝖦𝗂𝗏𝖾𝗇 𝖡𝖾𝗅𝗈𝗐.\n\n© 𝖳𝖾𝖺𝗆 <a href='https://t.me/ProSearchFather'>@𝖯𝗋𝗈𝖲𝖾𝖺𝗋𝖼𝗁𝖥𝖺𝗍𝗁𝖾𝗋</a></b>",
+        quote=True,
+        reply_markup=InlineKeyboardMarkup(links_btn)
     )
     
 @Client.on_message(filters.command(["help"]) & filters.private, group=1)
