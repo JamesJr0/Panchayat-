@@ -30,7 +30,9 @@ async def links(client, message):
         photo="http://graph.org/file/8270c1de86b6a36255eaf.jpg",
         text="<b>🔗 𝖢𝗁𝖾𝖼𝗄 𝖮𝗎𝗍 𝖠𝗅𝗅 𝖮𝗎𝗋 𝖫𝗂𝗇𝗄𝗌 𝖥𝗋𝗈𝗆 𝗍𝗁𝖾 𝖡𝗎𝗍𝗍𝗈𝗇𝗌 𝖦𝗂𝗏𝖾𝗇 𝖡𝖾𝗅𝗈𝗐.\n\n© 𝖳𝖾𝖺𝗆 <a href='https://t.me/ProSearchFather'>@𝖯𝗋𝗈𝖲𝖾𝖺𝗋𝖼𝗁𝖥𝖺𝗍𝗁𝖾𝗋</a></b>",
         quote=True,
-        reply_markup=InlineKeyboardMarkup(links_btn)
+        reply_markup=InlineKeyboardMarkup(links_btn),
+        parse_mode=enums.ParseMode.HTML,
+        reply_to_message_id=message.id
     )
     
 @Client.on_message(filters.command(["help"]) & filters.private, group=1)
