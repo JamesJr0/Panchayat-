@@ -9,7 +9,9 @@ CMD = ["/", "."]
 
 HELP_TXT = """<b>Bro, Check Movie Name In #Google and Try ! Then No Results Add Movie Year and Try , Again No Results ? It's Not Available In Our Database Or Movie Not Released !\n\nബ്രോ, മൂവിയുടെ പേര് മാത്രം #Google നോക്കിയിട്ട് അടിച്ചു നോക്കുക..!!\n\nഎന്നിട്ടും കിട്ടിയില്ലെങ്കിൽ പേരിന്റെ കൂടെ മൂവി ഇറങ്ങിയ വർഷം കൂടി അടിച്ചു നോക്ക് 😁\n\nഎന്നിട്ടും കിട്ടിയില്ലെങ്കിൽ ആ മൂവി ഞങ്ങളുടെ ഡാറ്റാബേസിൽ ഇല്ല, അല്ലെങ്കിൽ ആ മൂവി ഇറങ്ങിയിട്ടില്ല എന്ന് മനസ്സിലാക്കുക! 🤗⚠️\n\n📌 𝖢𝗁𝖾𝖼𝗄 𝖳𝗎𝗍𝗈𝗋𝗂𝖺𝗅 𝖵𝗂𝖽𝖾𝗈 𝖡𝗒 /Tutorial 𝖢𝗈𝗆𝗆𝖺𝗇𝖽 🤗.</b>"""
 
-links_btn = [
+@Client.on_message(filters.command(["links"]) & filters.private, group=1)
+async def links(client, message):
+    links_btn = [
     [
         InlineKeyboardButton(text = 'ʙᴏᴛ ᴜᴘᴅᴀᴛᴇꜱ ᴄʜᴀɴɴᴇʟ', url = f"{UPDATES_CHANNEL}")
     ],
@@ -22,15 +24,15 @@ links_btn = [
     [
         InlineKeyboardButton(text = 'ʟᴀᴛᴇꜱᴛ ᴜᴘʟᴏᴀᴅꜱ ᴄʜᴀɴɴᴇʟ', url = f"{LATEST_UPLOADS}")
     ]
-]
+    ]
 
-@Client.on_message(filters.command(["links"]) & filters.private, group=1)
-async def links(client, message):
+    reply_markup = InlineKeyboardMarkup(links_btn)
+    
     await message.reply_photo(
         photo="http://graph.org/file/8270c1de86b6a36255eaf.jpg",
         text="<b>🔗 𝖢𝗁𝖾𝖼𝗄 𝖮𝗎𝗍 𝖠𝗅𝗅 𝖮𝗎𝗋 𝖫𝗂𝗇𝗄𝗌 𝖥𝗋𝗈𝗆 𝗍𝗁𝖾 𝖡𝗎𝗍𝗍𝗈𝗇𝗌 𝖦𝗂𝗏𝖾𝗇 𝖡𝖾𝗅𝗈𝗐.\n\n© 𝖳𝖾𝖺𝗆 <a href='https://t.me/ProSearchFather'>@𝖯𝗋𝗈𝖲𝖾𝖺𝗋𝖼𝗁𝖥𝖺𝗍𝗁𝖾𝗋</a></b>",
         quote=True,
-        reply_markup=InlineKeyboardMarkup(links_btn),
+        reply_markup=reply_markup,
         parse_mode=enums.ParseMode.HTML,
         reply_to_message_id=message.id
     )
