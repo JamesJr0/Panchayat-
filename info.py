@@ -55,7 +55,6 @@ LATEST_UPLOADS = environ.get('LATEST_UPLOADS', "https://t.me/+-a7Vk8PDrCtiYTA9")
 MOVIE_BOT = environ.get('MOVIE_BOT', "http://t.me/bae_suzzy_bot?start=help")
 
 # Others
-BIN_CHANNEL = int(environ. get('BIN_CHANNEL', '-1002130571317'))
 LOG_CHANNEL = int(environ.get('LOG_CHANNEL', '-1002130571317'))
 SUPPORT_CHAT = environ.get('SUPPORT_CHAT', 'DKBOTxCHATS')
 P_TTI_SHOW_OFF = is_enabled((environ.get('P_TTI_SHOW_OFF', "False")), False)
