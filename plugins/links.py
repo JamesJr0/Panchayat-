@@ -1,0 +1,32 @@
+from pyrogram.types import Message
+from pyrogram import Client, filters, enums
+from info import UPDATES_CHANNEL, LATEST_UPLOADS, MOVIE_GROUP, MOVIE_BOT
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+CMD = ["/", "."]
+
+links_btn = [
+    [
+        InlineKeyboardButton("ʙᴏᴛ ᴜᴘᴅᴀᴛᴇꜱ ᴄʜᴀɴɴᴇʟ", url = f"{UPDATES_CHANNEL}")
+    ],
+    [
+        InlineKeyboardButton("ᴍᴏᴠɪᴇ ꜱᴇᴀʀᴄʜ ɢʀᴏᴜᴘ", url = f"{MOVIE_GROUP}")
+    ],
+    [
+        InlineKeyboardButton("ᴍᴏᴠɪᴇ ꜱᴇᴀʀᴄʜ ʙᴏᴛ", url = f"{MOVIE_BOT}")
+    ],
+    [
+        InlineKeyboardButton("ʟᴀᴛᴇꜱᴛ ᴜᴘʟᴏᴀᴅꜱ ᴄʜᴀɴɴᴇʟ", url = f"{LATEST_UPLOADS}")
+    ]  
+]
+
+@Client.on_message(filters.command("links", CMD))
+async def linkslist(client, message):
+    await message.reply_photo(
+        photo="http://graph.org/file/8270c1de86b6a36255eaf.jpg",
+        text="<b>🔗 𝖢𝗁𝖾𝖼𝗄 𝖮𝗎𝗍 𝖠𝗅𝗅 𝖮𝗎𝗋 𝖫𝗂𝗇𝗄𝗌 𝖥𝗋𝗈𝗆 𝗍𝗁𝖾 𝖡𝗎𝗍𝗍𝗈𝗇𝗌 𝖦𝗂𝗏𝖾𝗇 𝖡𝖾𝗅𝗈𝗐.\n\n© 𝖳𝖾𝖺𝗆 <a href='https://t.me/ProSearchFather'>@𝖯𝗋𝗈𝖲𝖾𝖺𝗋𝖼𝗁𝖥𝖺𝗍𝗁𝖾𝗋</a></b>",
+        reply_markup=InlineKeyboardMarkup(links_btn),
+        disable_web_page_preview=True,
+        parse_mode=enums.ParseMode.HTML,
+        reply_to_message_id=message.id
+    )
