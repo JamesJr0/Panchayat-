@@ -9,6 +9,6 @@ bs4
 cinemagoer
 aiohttp
 python-dotenv
-
+git+https://github.com/agronholm/anyio
 
 
