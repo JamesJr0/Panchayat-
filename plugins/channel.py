@@ -1,6 +1,6 @@
 from pyrogram import Client, filters
 from info import CHANNELS
-from database.ia_filterdb import save_file
+from database.ia_filterdb import save_file1, save_file2, check_file
 
 media_filter = filters.document | filters.video | filters.audio
 
@@ -17,4 +17,16 @@ async def media(bot, message):
 
     media.file_type = file_type
     media.caption = message.caption
-    await save_file(media)
+
+    if message.id % 2 == 0:
+        tru = await check_file(media)
+        if tru == "okda":
+            await save_file1(media)
+        else:
+            print("skipped duplicate file from saving to db 1 😌")
+    else:
+        tru = await check_file(media)
+        if tru == "okda":
+            await save_file2(media)
+        else:
+            print("skipped duplicate file from saving to db 2 😌")

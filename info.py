@@ -36,7 +36,8 @@ auth_grp = environ.get('AUTH_GROUP')
 AUTH_GROUPS = [int(ch) for ch in auth_grp.split()] if auth_grp else None
 
 # MongoDB information
-DATABASE_URI = environ.get('DATABASE_URI', "mongodb+srv://shibu:iCcuN8t4huNvi4Qy@suzzy.jnxmryf.mongodb.net/?retryWrites=true&w=majority")
+DATABASE_URI1 = environ.get('DATABASE_URI1', "mongodb+srv://shibu:iCcuN8t4huNvi4Qy@suzzy.jnxmryf.mongodb.net/?retryWrites=true&w=majority")
+DATABASE_URI2 = environ.get('DATABASE_URI2', "")
 DATABASE_NAME = environ.get('DATABASE_NAME', "shibhukabot")
 COLLECTION_NAME = environ.get('COLLECTION_NAME', 'shibubot')
 
@@ -46,7 +47,7 @@ AUTH_CHANNEL = int(auth_channel) if auth_channel and id_pattern.search(auth_chan
 # Set to False inside the bracket if you don't want to use Request Channel else set it to Channel ID
 REQ_CHANNEL = environ.get("REQ_CHANNEL", False)
 REQ_CHANNEL = int(REQ_CHANNEL) if REQ_CHANNEL and id_pattern.search(REQ_CHANNEL) else False
-JOIN_REQS_DB = environ.get("JOIN_REQS_DB", DATABASE_URI)
+JOIN_REQS_DB = environ.get("JOIN_REQS_DB", DATABASE_URI1)
 
 # CHANNELS LIST KEYS
 UPDATES_CHANNEL = environ.get('UPDATES_CHANNEL', "https://t.me/+6guhTe_AHh44ODY1")

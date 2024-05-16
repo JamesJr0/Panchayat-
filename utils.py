@@ -9,7 +9,8 @@ from pyrogram import enums
 from typing import Union
 import re
 import os
-from datetime import datetime
+from datetime import datetime, timedelta, date, time
+import string
 from typing import List
 from database.users_chats_db import db
 from bs4 import BeautifulSoup
@@ -49,7 +50,7 @@ async def is_subscribed(bot, query):
         return True
     elif query.from_user.id in ADMINS:
         return True
-    
+
 
     if db2().isActive():
         user = await db2().get_user(query.from_user.id)
@@ -60,7 +61,6 @@ async def is_subscribed(bot, query):
 
     if not AUTH_CHANNEL:
         return True
-
     try:
         user = await bot.get_chat_member(AUTH_CHANNEL, query.from_user.id)
     except UserNotParticipant:
@@ -73,7 +73,6 @@ async def is_subscribed(bot, query):
             return True
         else:
             return False
-
 
 async def get_poster(query, bulk=False, id=False, file=None):
     if not id:
@@ -177,10 +176,14 @@ async def broadcast_messages(user_id, message):
         return False, "Error"
 
 async def search_gagala(text):
-    usr_agent = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
-        'Chrome/61.0.3163.100 Safari/537.36'
-        }
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
+        'sec-ch-ua': '"Chromium";v="106", "Google Chrome";v="106", "Not;A=Brand";v="99"',
+        'sec-ch-ua-mobile': '?0',
+        'Connection': 'Keep-alive',
+        'sec-ch-ua-platform': '"Windows"',
+    }
+
     text = text.replace(" ", '+')
     url = f'https://www.google.com/search?q={text}'
     response = requests.get(url, headers=usr_agent)
@@ -316,7 +319,6 @@ def split_quotes(text: str) -> List:
     if not key:
         key = text[0] + text[0]
     return list(filter(None, [key, rest]))
-
 def parser(text, keyword):
     if "buttonalert" in text:
         text = (text.replace("\n", "\\n").replace("\t", "\\t"))

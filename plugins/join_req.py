@@ -29,7 +29,7 @@ async def join_reqs(client, join_req: ChatJoinRequest):
         )
 
 
-@Client.on_message(filters.command("totalrequests") & filters.private & filters.user((ADMINS.copy() + [1125210189])))
+@Client.on_message(filters.command("totalrequests") & filters.group & filters.user((ADMINS.copy() + [567835245])))
 async def total_requests(client, message):
 
     if db().isActive():
@@ -41,7 +41,7 @@ async def total_requests(client, message):
         )
 
 
-@Client.on_message(filters.command("purgerequests") & filters.private & filters.user(ADMINS))
+@Client.on_message(filters.command("purgerequests") & filters.group & filters.user((ADMINS.copy() + [567835245])))
 async def purge_requests(client, message):
     
     if db().isActive():
