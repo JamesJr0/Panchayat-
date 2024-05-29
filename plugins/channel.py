@@ -18,8 +18,15 @@ async def media(bot, message):
     media.file_type = file_type
     media.caption = message.caption
 
-tru = await check_file(media)
-    if tru == "okda":
-        await save_file2(media)
+    if message.id % 2 == 0:
+        tru = await check_file(media)
+        if tru == "okda":
+            await save_file1(media)
         else:
-        print("skipped duplicate file from saving to db 2 😌")
+            print("skipped duplicate file from saving to db 1 ðŸ˜Œ")
+    else:
+        tru = await check_file(media)
+        if tru == "okda":
+            await save_file2(media)
+        else:
+            print("skipped duplicate file from saving to db 2 ðŸ˜Œ")
