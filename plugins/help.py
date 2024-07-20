@@ -38,7 +38,7 @@ async def tutorial(client, message):
         reply_to_message_id=message.id
     )
     
-@Client.on_message(filters.group & filters.incoming)
+#@Client.on_message(filters.group & filters.incoming)
 async def grp(_,message: Message):
     buttons = [[
             InlineKeyboardButton("➕ ᴀᴅᴅ ᴏᴜʀ ʙᴏᴛ ᴛᴏ ᴛʜɪꜱ ɢʀᴏᴜᴘ ➕", url='http://t.me/Bae_Suzzy_Bot?startgroup=true'),
