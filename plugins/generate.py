@@ -60,7 +60,7 @@ async def generate_link(c: Client, query: CallbackQuery):
         print("<b><i>ഊമ്പി 🙃</b></i>")
         return
 
-  @Client.on_message(filters.chat(GENLINK_CHANNEL) & filters.reply)
+@Client.on_message(filters.chat(GENLINK_CHANNEL) & filters.reply)
 async def return_link(c: Client, message: Message):
     if message.reply_to_message and message.reply_to_message.id in forwarded_messages:
         user_id = forwarded_messages[message.reply_to_message.id]
