@@ -1,6 +1,6 @@
 aiofiles
 aiohttp
-bs4==0.0.1
+bs4
 datetime
 git+https://github.com/agronholm/anyio
 git+https://github.com/Joelkb/cinemagoer
