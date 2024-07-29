@@ -15,7 +15,7 @@ from pyrogram.types import CallbackQuery, Message, InlineKeyboardMarkup, InlineK
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-GENLINK_CHANNEL = -1002149893947
+GENLINK_CHANNEL = -1002200072223
 chat_id_dict = {}
 file_id_dict = {}
 forwarded_messages = {}
