@@ -117,7 +117,7 @@ async def start(client, message):
                     chat_id=message.from_user.id,
                     file_id=msg.get("file_id"),
                     caption=f_caption,
-                    reply_markup=InlineKeyboardMarkup( [ [InlineKeyboardButton("🌿 Jᴏɪɴ Fᴏʀ Mᴏʀᴇ 🌿", url=f"{UPDATES_CHANNEL}") ] ] ),
+                    reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Generate Direct Link", callback_data = "generate")]]),
                     protect_content=msg.get('protect', False),
                     )
             except FloodWait as e:
@@ -221,9 +221,7 @@ async def start(client, message):
         chat_id=message.from_user.id,
         file_id=file_id,
         caption=f_caption,
-        reply_markup=InlineKeyboardMarkup( [ [ InlineKeyboardButton("⚡ᴜᴘᴅᴀᴛᴇꜱ", url="https://t.me/ProSearchFather"),
-                                               InlineKeyboardButton("ꜱʜᴀʀᴇ ⚡", url="https://t.me/share/url?url=https://t.me/ProSearchFatherbot") ],
-                                             [ InlineKeyboardButton("🌀 ꜱᴜᴘᴘᴏʀᴛ ᴄʜᴀᴛ 🌀", url="https://t.me/+iqUWSdGIMOw3NGM1") ] ] ),
+        reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Generate Direct Link", callback_data = "generate")]]),
         protect_content=True if pre == 'filep' else False,
         )
                     
