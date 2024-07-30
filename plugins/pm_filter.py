@@ -376,7 +376,8 @@ async def cb_handler(client: Client, query: CallbackQuery):
                     chat_id=query.from_user.id,
                     file_id=file_id,
                     caption=f_caption,
-                    reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Generate Direct Link", callback_data = "generate")]]),
+                    reply_markup=InlineKeyboardMarkup( [ [ InlineKeyboardButton('🔗 Gᴇɴᴇʀᴀᴛᴇ Dɪʀᴇᴄᴛ Lɪɴᴋ 🔗', callback_data = "generate") ],
+                                                         [ InlineKeyboardButton('⚙️ Bᴏᴛ Uᴘᴅᴀᴛᴇ Cʜᴀɴɴᴇʟ ⚙️', url=f"{UPDATES_CHANNEL}") ] ] ),
                     protect_content=True if ident == "filep" else False 
                 )
                 await query.answer('𝖨 𝖧𝖺𝗏𝖾 𝖲𝖾𝗇𝗍 𝖸𝗈𝗎 𝖥𝗂𝗅𝖾𝗌...', show_alert=False)
@@ -417,7 +418,8 @@ async def cb_handler(client: Client, query: CallbackQuery):
             chat_id=query.from_user.id,
             file_id=file_id,
             caption=f_caption,
-            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Generate Direct Link", callback_data = "generate")]]),
+            reply_markup=InlineKeyboardMarkup( [ [ InlineKeyboardButton('🔗 Gᴇɴᴇʀᴀᴛᴇ Dɪʀᴇᴄᴛ Lɪɴᴋ 🔗', callback_data = "generate") ],
+                                                 [ InlineKeyboardButton('⚙️ Bᴏᴛ Uᴘᴅᴀᴛᴇ Cʜᴀɴɴᴇʟ ⚙️', url=f"{UPDATES_CHANNEL}") ] ] ),
             protect_content=True if ident == 'checksubp' else False
         )
     elif query.data == "pages":
