@@ -33,7 +33,7 @@ async def linkslist(client: Client, message: Message):
     )
 
 @Client.on_message(filters.command("latest"))
-async def send_latest(client: Client, message: Message);
+async def send_latest(client: Client, message: Message):
     last_message = await client.get_history(CHANNEL_ID, limit=1)
     last_message_text = last_message[0].text
     await message.reply(last_message_text)
