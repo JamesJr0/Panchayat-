@@ -4,7 +4,7 @@ from info import UPDATES_CHANNEL, LATEST_UPLOADS, MOVIE_GROUP, MOVIE_BOT
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 CMD = ["/", "."]
-CHANNEL = -1002224909238
+CHANNEL_ID = -1002224909238
 
 links_btn = [
     [
