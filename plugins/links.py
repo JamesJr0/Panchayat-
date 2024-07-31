@@ -4,6 +4,7 @@ from info import UPDATES_CHANNEL, LATEST_UPLOADS, MOVIE_GROUP, MOVIE_BOT
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 CMD = ["/", "."]
+CHANNEL = -1002224909238
 
 links_btn = [
     [
@@ -21,7 +22,7 @@ links_btn = [
 ]
 
 @Client.on_message(filters.command("links", CMD))
-async def linkslist(client, message):
+async def linkslist(client: Client, message: Message):
     await message.reply_photo(
         photo="http://graph.org/file/8270c1de86b6a36255eaf.jpg",
         text="<b>🔗 𝖢𝗁𝖾𝖼𝗄 𝖮𝗎𝗍 𝖠𝗅𝗅 𝖮𝗎𝗋 𝖫𝗂𝗇𝗄𝗌 𝖥𝗋𝗈𝗆 𝗍𝗁𝖾 𝖡𝗎𝗍𝗍𝗈𝗇𝗌 𝖦𝗂𝗏𝖾𝗇 𝖡𝖾𝗅𝗈𝗐.\n\n© 𝖳𝖾𝖺𝗆 <a href='https://t.me/ProSearchFather'>@𝖯𝗋𝗈𝖲𝖾𝖺𝗋𝖼𝗁𝖥𝖺𝗍𝗁𝖾𝗋</a></b>",
@@ -30,3 +31,9 @@ async def linkslist(client, message):
         parse_mode=enums.ParseMode.HTML,
         reply_to_message_id=message.id
     )
+
+@Client.on_message(filters.command("latest"))
+async def send_latest(client: Client, message: Message);
+    last_message = await client.get_history(CHANNEL_ID, limit=1)
+    last_message_text = last_message[0].text
+    await message.reply(last_message_text)
