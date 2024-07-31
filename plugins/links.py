@@ -33,6 +33,6 @@ async def linkslist(client: Client, message: Message):
 
 
 @Client.on_message(filters.command("latest") & filters.incoming)
-async def give_latest(client: Client, message):
+async def give_latest(client: Client, message: Message):
     return await client.copy_message(message.chat.id, -1002224909238, 2, reply_to_message_id=message.id)
     
