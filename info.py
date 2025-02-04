@@ -38,6 +38,7 @@ AUTH_GROUPS = [int(ch) for ch in auth_grp.split()] if auth_grp else None
 # MongoDB information
 DATABASE_URI1 = environ.get('DATABASE_URI1', "mongodb+srv://shibu:iCcuN8t4huNvi4Qy@suzzy.jnxmryf.mongodb.net/?retryWrites=true&w=majority")
 DATABASE_URI2 = environ.get('DATABASE_URI2', "")
+DATABASE_URI3 = environ.get('DATABASE_URI3', "")
 DATABASE_NAME = environ.get('DATABASE_NAME', "shibhukabot")
 COLLECTION_NAME = environ.get('COLLECTION_NAME', 'shibubot')
 
