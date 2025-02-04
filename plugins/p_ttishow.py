@@ -3,7 +3,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from pyrogram.errors.exceptions.bad_request_400 import MessageTooLong, PeerIdInvalid
 from info import ADMINS, LOG_CHANNEL, MELCOW_NEW_USERS
 from database.users_chats_db import db
-from database.ia_filterdb import Media1, Media2, db1 as clientDB1, db2 as clientDB2
+from database.ia_filterdb import Media1, Media2, Media3, db1 as clientDB1, db2 as clientDB2
 from utils import get_size, temp, get_settings
 from Script import script
 from pyrogram.errors import ChatAdminRequired
