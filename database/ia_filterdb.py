@@ -1,4 +1,4 @@
-import logging, re, base64
+import logging, re, base64, asyncio
 from struct import pack
 from pyrogram.file_id import FileId
 from pymongo.errors import DuplicateKeyError
