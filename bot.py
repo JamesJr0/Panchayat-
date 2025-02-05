@@ -40,7 +40,7 @@ class Bot(Client):
         await super().start()
         await Media1.ensure_indexes()
         await Media2.ensure_indexes()
-        await Media3.ensure_indexes()
+        
         me = await self.get_me()
         temp.ME = me.id
         temp.U_NAME = me.username
