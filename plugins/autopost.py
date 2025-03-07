@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from info import ADMINS  # Only importing ADMINS
 
 # Define channel and API key here
-POST_CHANNEL = -1002318440616  # Replace with your actual channel ID
+POST_CHANNEL = -1001842826681  # Replace with your actual channel ID
 OMDB_API_KEY = "544664d"  # Replace with your actual OMDb API key
 
 # Predefined genre list
