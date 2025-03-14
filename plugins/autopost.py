@@ -99,9 +99,9 @@ async def generate_post(client, message):
     formatted_title = title.replace(" ", "_").replace(".", "_")
     
     if season_identifier:
-        button_url = f"http://t.me/ProSearchMovies_bot?start=search_{formatted_title}_{season_identifier}"
+        button_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}_{season_identifier}"
     else:
-        button_url = f"http://t.me/ProSearchMovies_bot?start=search_{formatted_title}_{year}" if year else f"http://t.me/ProSearchMovies_bot?start=search_{formatted_title}"
+        button_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}_{year}" if year else f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}"
 
     keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton("🔎 Click Here To Search 🔍", url=button_url)]
