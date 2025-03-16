@@ -461,15 +461,24 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 @Client.on_message(filters.command("latest"))
 async def latest_movies(client, message):
+    await send_latest_movies(client, message)
+
+async def send_latest_movies(client, message, edit_message=None):
     latest_movies = await get_latest_movies()
 
     if not isinstance(latest_movies, list):
         print(f"Unexpected data type: {type(latest_movies)}, Value: {repr(latest_movies)}")  # Debugging
-        await message.reply("⚠️ Error: Unexpected data format.")
+        if edit_message:
+            await edit_message.edit_text("⚠️ Error: Unexpected data format.")
+        else:
+            await message.reply("⚠️ Error: Unexpected data format.")
         return
 
     if not latest_movies:
-        await message.reply("📭 No latest movies or series found.")
+        if edit_message:
+            await edit_message.edit_text("📭 No latest movies or series found.")
+        else:
+            await message.reply("📭 No latest movies or series found.")
         return
 
     movie_response = "🎬 **Latest Movies Added to Database**\n"
@@ -489,9 +498,9 @@ async def latest_movies(client, message):
             if movies:
                 has_series = True
                 for series in movies:
-                    series_name = f"`{series['title']}`"  # Monospace format for title
-                    language_tag = f"#{series['language']}"  # Regular font for language tag
-                    series_response += f"• {series_name} {language_tag}\n"
+                    series_name = f"`{series['title']}`"  # Monospace for title
+                    language_tag = f" #{series['language']}"  # Normal text for language tag
+                    series_response += f"• {series_name}{language_tag}\n"
         else:  
             language = data.get("language", "").title()
             if movies:
@@ -505,24 +514,36 @@ async def latest_movies(client, message):
         response += "\n" + series_response
 
     if not response.strip():
-        await message.reply("📭 No new movies or series found.")
+        if edit_message:
+            await edit_message.edit_text("📭 No new movies or series found.")
+        else:
+            await message.reply("📭 No new movies or series found.")
         return
 
     # ✅ Add "Team @ProSearchFather" at the end
     response += "\n\n**Team @ProSearchFather**"
 
-    # ✅ Inline Buttons: "Close" + "Latest Updates Channel"
+    # ✅ Inline Buttons: "Refresh" + "Latest Updates Channel" + "Close"
     keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🔄 Refresh", callback_data="refresh_latest")],
         [InlineKeyboardButton("📢 Latest Updates Channel", url="https://t.me/+-a7Vk8PDrCtiYTA9")],
         [InlineKeyboardButton("🔒 Close", callback_data="close_message")]
     ])
 
-    await message.reply(response.strip(), reply_markup=keyboard)
+    if edit_message:
+        await edit_message.edit_text(response.strip(), reply_markup=keyboard)
+    else:
+        await message.reply(response.strip(), reply_markup=keyboard)
+
+@Client.on_callback_query(filters.regex("^refresh_latest$"))
+async def refresh_latest(client, callback_query):
+    await send_latest_movies(client, callback_query.message, edit_message=callback_query.message)
 
 @Client.on_callback_query(filters.regex("^close_message$"))
 async def close_message(client, callback_query):
     await callback_query.message.delete()  # Deletes the message
     await callback_query.answer("✅ Message closed", show_alert=False)  # Optional acknowledgment
+
 
 
 
