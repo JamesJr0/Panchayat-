@@ -456,6 +456,7 @@ async def settings(client, message):
 
 
 import re
+from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 @Client.on_message(filters.command("latest"))
@@ -481,21 +482,21 @@ async def latest_movies(client, message):
             print(f"Unexpected data format in latest_movies: {repr(data)}")  # Debugging
             continue
 
-        # Identify if it's a series or movie category
         category = data.get("category", "")
         movies = data.get("movies", [])
 
         if category == "Series":  
-        if movies:
-            has_series = True
-            for series in movies:
-                series_name = f"`{series['title']}`"  # Monospace format
-                language_tag = f"#{series['language']}"  # Regular font tag
+            if movies:
+                has_series = True
+                for series in movies:
+                    series_name = f"`{series['title']}`"  # Monospace format for title
+                    language_tag = f"#{series['language']}"  # Regular font for language tag
+                    series_response += f"• {series_name} {language_tag}\n"
         else:  
             language = data.get("language", "").title()
             if movies:
                 has_movies = True
-                movie_response += f"\n**{language}:**\n" + "\n".join(f"• `{m}`" for m in movies) + "\n"  # Monospace format
+                movie_response += f"\n**{language}:**\n" + "\n".join(f"• `{m}`" for m in movies) + "\n"
 
     response = ""
     if has_movies:
@@ -522,6 +523,7 @@ async def latest_movies(client, message):
 async def close_message(client, callback_query):
     await callback_query.message.delete()  # Deletes the message
     await callback_query.answer("✅ Message closed", show_alert=False)  # Optional acknowledgment
+
 
 
 
