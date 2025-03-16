@@ -460,28 +460,19 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 @Client.on_message(filters.command("latest"))
 async def latest_movies(client, message):
-    await send_latest_movies(client, message)
-
-async def send_latest_movies(client, message, edit_message=None):
     latest_movies = await get_latest_movies()
 
     if not isinstance(latest_movies, list):
         print(f"Unexpected data type: {type(latest_movies)}, Value: {repr(latest_movies)}")  # Debugging
-        if edit_message:
-            await edit_message.edit_text("⚠️ Error: Unexpected data format.")
-        else:
-            await message.reply("⚠️ Error: Unexpected data format.")
+        await message.reply("⚠️ Error: Unexpected data format.")
         return
 
     if not latest_movies:
-        if edit_message:
-            await edit_message.edit_text("📭 No latest movies or series found.")
-        else:
-            await message.reply("📭 No latest movies or series found.")
+        await message.reply("📭 No latest movies or series found.")
         return
 
     movie_response = "🎬 **Latest Movies Added to Database**\n"
-    series_response = "📺 **Latest Series Added to Database**\n"
+    series_response = "📺 **Latest Series Added to Database**\n\n"  # Added a new line for spacing
     has_movies = False
     has_series = False
 
@@ -498,11 +489,11 @@ async def send_latest_movies(client, message, edit_message=None):
                 has_series = True
                 for series in movies:
                     if isinstance(series, dict):  # Ensure it's a dictionary
-                        series_title = f"`{series.get('title', 'Unknown')}`"  # Monospace title
-                        language_tag = f" #{series.get('language', 'Unknown')}"  # Default font for language tag
+                        series_title = f"{series.get('title', 'Unknown')}"  # **No Monospace**
+                        language_tag = f" #{series.get('language', 'Unknown')}"  # Language tag stays regular
                         series_response += f"• {series_title} {language_tag}\n"
-                    else:  # If it's just a string, format only the title
-                        series_response += f"• `{series}`\n"
+                    else:  # If it's just a string, add normally
+                        series_response += f"• {series}\n"
         else:  
             language = data.get("language", "").title()
             if movies:
@@ -513,38 +504,28 @@ async def send_latest_movies(client, message, edit_message=None):
     if has_movies:
         response += movie_response
     if has_series:
-        response += "\n" + series_response
+        response += "\n" + series_response.strip()  # Ensure no extra spaces at the end
 
     if not response.strip():
-        if edit_message:
-            await edit_message.edit_text("📭 No new movies or series found.")
-        else:
-            await message.reply("📭 No new movies or series found.")
+        await message.reply("📭 No new movies or series found.")
         return
 
     # ✅ Add "Team @ProSearchFather" at the end
     response += "\n\n**Team @ProSearchFather**"
 
-    # ✅ Inline Buttons: "Refresh" + "Latest Updates Channel" + "Close"
+    # ✅ Inline Buttons: "Latest Updates Channel" + "Close"
     keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("🔄 Refresh", callback_data="refresh_latest")],
         [InlineKeyboardButton("📢 Latest Updates Channel", url="https://t.me/+-a7Vk8PDrCtiYTA9")],
         [InlineKeyboardButton("🔒 Close", callback_data="close_message")]
     ])
 
-    if edit_message:
-        await edit_message.edit_text(response.strip(), reply_markup=keyboard)
-    else:
-        await message.reply(response.strip(), reply_markup=keyboard)
-
-@Client.on_callback_query(filters.regex("^refresh_latest$"))
-async def refresh_latest(client, callback_query):
-    await send_latest_movies(client, callback_query.message, edit_message=callback_query.message)
+    await message.reply(response.strip(), reply_markup=keyboard)
 
 @Client.on_callback_query(filters.regex("^close_message$"))
 async def close_message(client, callback_query):
     await callback_query.message.delete()  # Deletes the message
     await callback_query.answer("✅ Message closed", show_alert=False)  # Optional acknowledgment
+
 
 
 
