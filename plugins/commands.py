@@ -486,9 +486,11 @@ async def latest_movies(client, message):
         movies = data.get("movies", [])
 
         if category == "Series":  
-            if movies:
-                has_series = True
-                series_response += "\n".join(f"• `{s}`" for s in movies) + "\n"  # Monospace format
+        if movies:
+            has_series = True
+            for series in movies:
+                series_name = f"`{series['title']}`"  # Monospace format
+                language_tag = f"#{series['language']}"  # Regular font tag
         else:  
             language = data.get("language", "").title()
             if movies:
