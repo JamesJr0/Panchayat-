@@ -272,10 +272,10 @@ async def get_latest_movies():
     latest_movies["Multi"] = []  # Multi-language category
     latest_series = []  # Store series with language tags
 
-    # Fetch latest 30 movies from multiple databases
-    movies1 = await Media1.collection.find().sort("$natural", -1).limit(30).to_list(None)
-    movies2 = await Media2.collection.find().sort("$natural", -1).limit(30).to_list(None)
-    movies3 = await Media3.collection.find().sort("$natural", -1).limit(30).to_list(None)
+    # Fetch latest 20 movies from multiple databases
+    movies1 = await Media1.collection.find().sort("$natural", -1).limit(20).to_list(None)
+    movies2 = await Media2.collection.find().sort("$natural", -1).limit(20).to_list(None)
+    movies3 = await Media3.collection.find().sort("$natural", -1).limit(20).to_list(None)
     
 
     all_movies = movies1 + movies2 + movies3 
@@ -324,8 +324,8 @@ async def get_latest_movies():
                 latest_movies["Multi"].append(movie_name)
 
     # ✅ Return structured results with series having language tags
-    results = [{"language": lang, "movies": latest_movies[lang][:7]} for lang in latest_movies if latest_movies[lang]]
+    results = [{"language": lang, "movies": latest_movies[lang][:8]} for lang in latest_movies if latest_movies[lang]]
     if latest_series:
-        results.append({"category": "Series", "movies": latest_series[:7]})  # Add Series separately
+        results.append({"category": "Series", "movies": latest_series[:10]})  # Add Series separately
 
     return results
