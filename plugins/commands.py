@@ -454,6 +454,7 @@ async def settings(client, message):
             reply_to_message_id=message.id
         )
 
+
 import re
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
@@ -480,6 +481,7 @@ async def latest_movies(client, message):
             print(f"Unexpected data format in latest_movies: {repr(data)}")  # Debugging
             continue
 
+        # Identify if it's a series or movie category
         category = data.get("category", "")
         movies = data.get("movies", [])
 
@@ -506,14 +508,18 @@ async def latest_movies(client, message):
     # ✅ Add "Team @ProSearchFather" at the end
     response += "\n\n**Team @ProSearchFather**"
 
-    # ✅ Inline "Close" Button
-    keyboard = InlineKeyboardMarkup(
-        [[InlineKeyboardButton("❌ Close", callback_data="close_message")]]
-    )
+    # ✅ Inline Buttons: "Close" + "Latest Updates Channel"
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("📢 Latest Updates Channel", url="https://t.me/+-a7Vk8PDrCtiYTA9")],
+        [InlineKeyboardButton("🔒 Close", callback_data="close_message")]
+    ])
 
     await message.reply(response.strip(), reply_markup=keyboard)
 
 @Client.on_callback_query(filters.regex("^close_message$"))
-async def close_message(client,
+async def close_message(client, callback_query):
+    await callback_query.message.delete()  # Deletes the message
+    await callback_query.answer("✅ Message closed", show_alert=False)  # Optional acknowledgment
+
 
 
