@@ -498,10 +498,10 @@ async def send_latest_movies(client, message, edit_message=None):
                 has_series = True
                 for series in movies:
                     if isinstance(series, dict):  # Ensure it's a dictionary
-                        series_name = f"`{series.get('title', 'Unknown')}`"  # Monospace for title
-                        language_tag = f" #{series.get('language', 'Unknown')}"  # Normal text for language tag
-                        series_response += f"• {series_name}{language_tag}\n"
-                    else:  # If it's just a string, print it without a language tag
+                        series_title = f"`{series.get('title', 'Unknown')}`"  # Monospace title
+                        language_tag = f" #{series.get('language', 'Unknown')}"  # Default font for language tag
+                        series_response += f"• {series_title} {language_tag}\n"
+                    else:  # If it's just a string, format only the title
                         series_response += f"• `{series}`\n"
         else:  
             language = data.get("language", "").title()
@@ -529,7 +529,7 @@ async def send_latest_movies(client, message, edit_message=None):
     keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton("🔄 Refresh", callback_data="refresh_latest")],
         [InlineKeyboardButton("📢 Latest Updates Channel", url="https://t.me/+-a7Vk8PDrCtiYTA9")],
-        [InlineKeyboardButton("❌ Close", callback_data="close_message")]
+        [InlineKeyboardButton("🔒 Close", callback_data="close_message")]
     ])
 
     if edit_message:
@@ -545,6 +545,7 @@ async def refresh_latest(client, callback_query):
 async def close_message(client, callback_query):
     await callback_query.message.delete()  # Deletes the message
     await callback_query.answer("✅ Message closed", show_alert=False)  # Optional acknowledgment
+
 
 
 
