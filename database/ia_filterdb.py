@@ -267,17 +267,18 @@ def unpack_new_file_id(new_file_id):
 import re
 
 async def get_latest_movies():
-    languages = ["Malayalam", "Tamil", "Telugu", "Kannada", "Hindi", "English", "Punjabi", "Gujarati", "Marathi", "Chinese", "Japanese", "Korean"]
+    languages = ["Malayalam", "Tamil", "Telugu", "Kannada", "Hindi", "English", "Chinese", "Japanese", "Korean"]
     latest_movies = {lang: [] for lang in languages}
-    latest_movies["Multi"] = []  # New category for multi-language movies
-    latest_series = []  # List for series (without language categorization)
+    latest_movies["Multi"] = []  # Multi-language category
+    latest_series = []  # Store series with language tags
 
-    # Fetch latest 20 movies from multiple databases
-    movies1 = await Media1.collection.find().sort("$natural", -1).limit(20).to_list(None)
-    movies2 = await Media2.collection.find().sort("$natural", -1).limit(20).to_list(None)
-    movies3 = await Media3.collection.find().sort("$natural", -1).limit(20).to_list(None)
+    # Fetch latest 30 movies from multiple databases
+    movies1 = await Media1.collection.find().sort("$natural", -1).limit(30).to_list(None)
+    movies2 = await Media2.collection.find().sort("$natural", -1).limit(30).to_list(None)
+    movies3 = await Media3.collection.find().sort("$natural", -1).limit(30).to_list(None)
+    
 
-    all_movies = movies1 + movies2 + movies3
+    all_movies = movies1 + movies2 + movies3 
 
     for movie in all_movies:
         file_name = movie.get("file_name", "")
@@ -290,15 +291,29 @@ async def get_latest_movies():
         # Detect if it's a series (SXXEYY format)
         series_match = re.search(r"(S\d{2})", file_name, re.IGNORECASE)
         if series_match:
-            series_name = re.sub(r"(S\d{2}).*", r"\1", file_name)  # Keep series name + season
-            if series_name not in latest_series:  # Avoid duplicates
-                latest_series.append(series_name)
-            continue  # Skip adding it to language categories
+            series_name = re.sub(r"(S\d{2}E\d{2}).*", r"\1", file_name)  # Keep series name + season/episode
+            detected_languages = set()
+
+            for lang in languages:
+                if re.search(rf"\b{lang}\b", caption, re.IGNORECASE):  # Match full language names
+                    detected_languages.add(lang)
+
+            # If multiple languages are found, mark as Multi
+            if len(detected_languages) > 1:
+                detected_languages = {"Multi"}
+
+            # Format series title with language tags
+            language_tags = " ".join(f"#{lang}" for lang in detected_languages) if detected_languages else "#Unknown"
+            series_title = f"{series_name} {language_tags}"
+
+            if series_title not in latest_series:
+                latest_series.append(series_title)
+            continue  # Skip adding to movies
 
         # Identify and store the movie in multiple language categories
         added_to_languages = set()
         for lang in languages:
-            if re.search(rf"\b{lang}\b", caption, re.IGNORECASE):  # Ensures full word match
+            if re.search(rf"\b{lang}\b", caption, re.IGNORECASE):  # Ensure full-word match
                 if movie_name not in latest_movies[lang]:  # Avoid duplicates
                     latest_movies[lang].append(movie_name)
                     added_to_languages.add(lang)
@@ -308,9 +323,9 @@ async def get_latest_movies():
             if movie_name not in latest_movies["Multi"]:
                 latest_movies["Multi"].append(movie_name)
 
-    # ✅ Return structured results
+    # ✅ Return structured results with series having language tags
     results = [{"language": lang, "movies": latest_movies[lang][:7]} for lang in latest_movies if latest_movies[lang]]
     if latest_series:
-        results.append({"category": "Series", "movies": latest_series[:7]})
+        results.append({"category": "Series", "movies": latest_series[:7]})  # Add Series separately
 
     return results
