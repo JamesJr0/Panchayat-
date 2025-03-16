@@ -277,7 +277,7 @@ async def get_latest_movies():
     movies2 = await Media2.collection.find().sort("$natural", -1).limit(20).to_list(None)
     movies3 = await Media3.collection.find().sort("$natural", -1).limit(20).to_list(None)
 
-    all_movies = movies1 + movies2 + movies3 + movies4
+    all_movies = movies1 + movies2 + movies3
 
     for movie in all_movies:
         file_name = movie.get("file_name", "")
