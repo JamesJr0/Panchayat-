@@ -265,67 +265,174 @@ def unpack_new_file_id(new_file_id):
 
 
 import re
+import asyncio
+from pyrogram import Client, filters
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+# Admin User IDs
+ADMIN_IDS = [6646976956]
+
+# Languages list
+LANGUAGES = ["Malayalam", "Tamil", "Telugu", "Kannada", "Hindi", "English", "Chinese", "Japanese", "Korean"]
+
+# Store manually added movies and series
+manual_titles = {
+    "Movies": {},
+    "Series": set()
+}
 
 async def get_latest_movies():
-    languages = ["Malayalam", "Tamil", "Telugu", "Kannada", "Hindi", "English", "Chinese", "Japanese", "Korean"]
-    latest_movies = {lang: [] for lang in languages}
-    latest_movies["Multi"] = []  # Multi-language category
-    latest_series = []  # Store series with language tags
+    latest_movies = {lang: set() for lang in LANGUAGES}
+    latest_movies["Multi"] = set()  
+    latest_series = set()
 
-    # Fetch latest 20 movies from multiple databases
-    movies1 = await Media1.collection.find().sort("$natural", -1).limit(20).to_list(None)
-    movies2 = await Media2.collection.find().sort("$natural", -1).limit(20).to_list(None)
-    movies3 = await Media3.collection.find().sort("$natural", -1).limit(20).to_list(None)
-    
+    # Fetch latest 20 movies from multiple databases concurrently
+    movies1, movies2, movies3 = await asyncio.gather(
+        Media1.collection.find().sort("$natural", -1).limit(20).to_list(None),
+        Media2.collection.find().sort("$natural", -1).limit(20).to_list(None),
+        Media3.collection.find().sort("$natural", -1).limit(20).to_list(None)
+    )
 
-    all_movies = movies1 + movies2 + movies3 
+    all_movies = movies1 + movies2 + movies3
 
     for movie in all_movies:
-        file_name = movie.get("file_name", "")
-        caption = str(movie.get("caption", ""))  # Ensure caption is always a string
+        file_name = movie.get("file_name", "").strip()
+        caption = str(movie.get("caption", "")).strip()
 
-        # Extract movie name and check if it's a series
-        match = re.search(r"(.+?)(\d{4})", file_name)
-        movie_name = f"{match.group(1).strip()} {match.group(2)}" if match else file_name
+        # Extract movie name and remove unnecessary encoding tags
+        match = re.search(r"(.+?)(?:\s+(\d{4}))?(?:\.\d{3,4}p|WEB-DL|HDRip|BluRay|HEVC|AAC|DDP5.1|x264|x265|H264|H265).*", file_name, re.IGNORECASE)
+        movie_name = match.group(1).strip() if match else file_name
 
-        # Detect if it's a series (SXXEYY format)
-        series_match = re.search(r"(S\d{2})", file_name, re.IGNORECASE)
+        # Detect series (SXXEYY format)
+        series_match = re.search(r"(.+?)\s?(S\d{1,2}E\d{1,2})", file_name, re.IGNORECASE)
         if series_match:
-            series_name = re.sub(r"(S\d{2}E\d{2}).*", r"\1", file_name)  # Keep series name + season/episode
-            detected_languages = set()
+            series_name, episode_tag = series_match.groups()
+            detected_languages = set(re.findall(r'\b(' + '|'.join(LANGUAGES) + r')\b', caption, re.IGNORECASE))
 
-            for lang in languages:
-                if re.search(rf"\b{lang}\b", caption, re.IGNORECASE):  # Match full language names
-                    detected_languages.add(lang)
-
-            # If multiple languages are found, mark as Multi
             if len(detected_languages) > 1:
                 detected_languages = {"Multi"}
 
-            # Format series title with language tags
             language_tags = " ".join(f"#{lang}" for lang in detected_languages) if detected_languages else "#Unknown"
-            series_title = f"{series_name} {language_tags}"
+            series_title = f"{series_name} {episode_tag} {language_tags}"
 
-            if series_title not in latest_series:
-                latest_series.append(series_title)
+            latest_series.add(series_title)
             continue  # Skip adding to movies
 
-        # Identify and store the movie in multiple language categories
-        added_to_languages = set()
-        for lang in languages:
-            if re.search(rf"\b{lang}\b", caption, re.IGNORECASE):  # Ensure full-word match
-                if movie_name not in latest_movies[lang]:  # Avoid duplicates
-                    latest_movies[lang].append(movie_name)
-                    added_to_languages.add(lang)
+        # Identify and store movies based on language
+        detected_languages = set(re.findall(r'\b(' + '|'.join(LANGUAGES) + r')\b', caption, re.IGNORECASE))
 
-        # If a movie belongs to multiple languages, add it to "Multi"
-        if len(added_to_languages) > 1:
-            if movie_name not in latest_movies["Multi"]:
-                latest_movies["Multi"].append(movie_name)
+        for lang in detected_languages:
+            latest_movies[lang].add(movie_name)
 
-    # ✅ Return structured results with series having language tags
-    results = [{"language": lang, "movies": latest_movies[lang][:8]} for lang in latest_movies if latest_movies[lang]]
+        if len(detected_languages) > 1:
+            latest_movies["Multi"].add(movie_name)
+
+    # Convert sets to lists and return structured data
+    results = [{"language": lang, "movies": list(latest_movies[lang])[:8]} for lang in latest_movies if latest_movies[lang]]
     if latest_series:
-        results.append({"category": "Series", "movies": latest_series[:10]})  # Add Series separately
+        results.append({"category": "Series", "movies": list(latest_series)[:10]})
 
     return results
+
+
+# Command to fetch latest movies
+@Client.on_message(filters.command("latest"))
+async def latest_movies(client, message):
+    await send_latest_movies(client, message)
+
+
+async def send_latest_movies(client, message):
+    latest_movies = await get_latest_movies()
+
+    if not isinstance(latest_movies, list):
+        await message.reply("⚠️ Error: Unexpected data format.")
+        return
+
+    if not latest_movies and not manual_titles["Movies"] and not manual_titles["Series"]:
+        await message.reply("📭 No latest movies or series found.")
+        return
+
+    movie_sections = []
+    series_sections = []
+
+    combined_movies = {lang: set() for lang in LANGUAGES}
+    combined_movies["Multi"] = set()
+
+    # Add manually added movies
+    for lang, movies in manual_titles["Movies"].items():
+        combined_movies[lang].update(movies)
+
+    # Process and filter movies/series data
+    latest_episodes = {}
+
+    for data in latest_movies:
+        category = data.get("category", "")
+        movies = data.get("movies", [])
+
+        if category == "Series":
+            for series in movies:
+                series_match = re.match(r"(.+?)\s(S\d{2}E\d{2})", series)
+                if series_match:
+                    series_name, episode_tag = series_match.groups()
+
+                    season_num = int(re.search(r'S(\d{2})', episode_tag).group(1))
+                    episode_num = int(re.search(r'E(\d{2})', episode_tag).group(1))
+
+                    if series_name not in latest_episodes or (
+                        season_num > latest_episodes[series_name]["season"] or
+                        (season_num == latest_episodes[series_name]["season"] and episode_num > latest_episodes[series_name]["episode"])
+                    ):
+                        latest_episodes[series_name] = {
+                            "full_title": series,
+                            "season": season_num,
+                            "episode": episode_num
+                        }
+
+        else:
+            language = data.get("language", "").title()
+            combined_movies[language].update(movies)
+
+    # Format movies list
+    for lang, movies in combined_movies.items():
+        if movies:
+            movie_sections.append(f"\n{lang}:\n" + "\n".join(f"• {m}" for m in sorted(movies)))
+
+    # Format series list
+    if latest_episodes:
+        series_sections.append("\n".join(f"• {ep['full_title']}" for ep in latest_episodes.values()))
+
+    if manual_titles["Series"]:
+        series_sections.append("\n".join(f"• {s}" for s in manual_titles["Series"]))
+
+    # Combine final response
+    response = "🎬 **Latest Movies Added to Database**\n" + "\n".join(movie_sections) if movie_sections else ""
+    response += "\n\n📺 **Latest Series Added to Database**\n" + "\n".join(series_sections) if series_sections else ""
+
+    if not response.strip():
+        await message.reply("📭 No new movies or series found.")
+        return
+
+    response += "\n\nTeam @ProSearchFather"
+
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("📢 Latest Updates Channel", url="https://t.me/+-a7Vk8PDrCtiYTA9")],
+        [InlineKeyboardButton("🔄 Refresh", callback_data="refresh_latest")],
+        [InlineKeyboardButton("❌ Close", callback_data="close_message")]
+    ])
+
+    await message.reply(response.strip(), reply_markup=keyboard)
+
+
+# Refresh Callback
+@Client.on_callback_query(filters.regex("^refresh_latest$"))
+async def refresh_latest(client, callback_query):
+    await callback_query.message.delete()
+    await send_latest_movies(client, callback_query.message)
+
+
+# Close Button Callback
+@Client.on_callback_query(filters.regex("^close_message$"))
+async def close_message(client, callback_query):
+    await callback_query.message.delete()
+    await callback_query.answer("✅ Message closed", show_alert=False)
+
