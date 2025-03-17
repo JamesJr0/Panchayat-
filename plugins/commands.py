@@ -455,6 +455,15 @@ async def settings(client, message):
         )
 
 
+import re
+import asyncio
+from pyrogram import Client, filters
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+# ✅ Define LANGUAGES globally
+LANGUAGES = ["Malayalam", "Tamil", "Telugu", "Kannada", "Hindi", "English", "Chinese", "Japanese", "Korean"]
+
+# ✅ Now it will be available in all functions
 
 # Command to fetch latest movies
 @Client.on_message(filters.command("latest"))
