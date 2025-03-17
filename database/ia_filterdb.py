@@ -269,11 +269,11 @@ import asyncio
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
+# ✅ Define LANGUAGES globally
+LANGUAGES = ["Malayalam", "Tamil", "Telugu", "Kannada", "Hindi", "English", "Chinese", "Japanese", "Korean"]
+
 # Admin User IDs
 ADMIN_IDS = [6646976956]
-
-# Languages list
-LANGUAGES = ["Malayalam", "Tamil", "Telugu", "Kannada", "Hindi", "English", "Chinese", "Japanese", "Korean"]
 
 # Store manually added movies and series
 manual_titles = {
@@ -283,7 +283,7 @@ manual_titles = {
 
 async def get_latest_movies():
     latest_movies = {lang: set() for lang in LANGUAGES}
-    latest_movies["Multi"] = set()  
+    latest_movies["Multi"] = set()
     latest_series = set()
 
     # Fetch latest 20 movies from multiple databases concurrently
@@ -334,5 +334,4 @@ async def get_latest_movies():
 
     return results
 
-
-
+# ✅ Now the variable is available everywhere in the script
