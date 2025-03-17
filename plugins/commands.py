@@ -459,7 +459,7 @@ import re
 import asyncio
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from filterdb import get_latest_movies, manual_titles
+from database.filterdb import get_latest_movies, manual_titles  # ✅ Ensure correct import path
 
 # ✅ Define LANGUAGES globally
 LANGUAGES = ["Malayalam", "Tamil", "Telugu", "Kannada", "Hindi", "English", "Chinese", "Japanese", "Korean"]
@@ -512,7 +512,7 @@ async def send_latest_movies(client, message):
                         (season_num == latest_episodes[series_name]["season"] and episode_num > latest_episodes[series_name]["episode"])
                     ):
                         latest_episodes[series_name] = {
-                            "full_title": f"• **{series_name}** {episode_tag}",
+                            "full_title": f"• {series_name} {episode_tag}",
                             "season": season_num,
                             "episode": episode_num
                         }
@@ -520,32 +520,37 @@ async def send_latest_movies(client, message):
         else:
             language = data.get("language", "").title()
             for movie in movies:
-                match = re.match(r"(.+?)\s*(\d{4})?", movie)
-                title = match.group(1).strip() if match else movie
-                year = f" ({match.group(2)})" if match and match.group(2) else ""
-                combined_movies[language].add(f"{title}{year}")
+                # Extract movie title and year
+                match = re.search(r"(.+?)\s?(\d{4})?", movie)
+                if match:
+                    title = match.group(1).strip()
+                    year = match.group(2) if match.group(2) else ""
+                    formatted_movie = f"• {title} {year}".strip()
+                    combined_movies[language].add(formatted_movie)
 
     # Format movies list
     for lang, movies in combined_movies.items():
         if movies:
-            movie_sections.append(f"\n**{lang}:**\n" + "\n".join(f"• {m}" for m in sorted(movies)))
+            section_title = f"\n**{lang}**:\n"
+            movie_list = "\n".join(sorted(movies))
+            movie_sections.append(section_title + movie_list)
 
     # Format series list
     if latest_episodes:
         series_sections.append("\n".join(ep["full_title"] for ep in latest_episodes.values()))
 
     if manual_titles["Series"]:
-        series_sections.append("\n".join(f"• **{s}**" for s in manual_titles["Series"]))
+        series_sections.append("\n".join(f"• {s}" for s in manual_titles["Series"]))
 
     # Combine final response
-    response = "**🎬 Latest Movies Added to Database**\n" + "\n".join(movie_sections) if movie_sections else ""
-    response += "\n\n**📺 Latest Series Added to Database**\n" + "\n".join(series_sections) if series_sections else ""
+    response = "🎬 **Latest Movies Added to Database**\n" + "\n".join(movie_sections) if movie_sections else ""
+    response += "\n\n📺 **Latest Series Added to Database**\n" + "\n".join(series_sections) if series_sections else ""
 
     if not response.strip():
         await message.reply("📭 No new movies or series found.")
         return
 
-    response += "\n\n**Team @ProSearchFather**"
+    response += "\n\nTeam @ProSearchFather"
 
     keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton("📢 Latest Updates Channel", url="https://t.me/+-a7Vk8PDrCtiYTA9")],
