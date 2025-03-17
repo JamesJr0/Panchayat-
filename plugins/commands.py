@@ -463,6 +463,12 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 # ✅ Define LANGUAGES globally
 LANGUAGES = ["Malayalam", "Tamil", "Telugu", "Kannada", "Hindi", "English", "Chinese", "Japanese", "Korean"]
 
+manual_titles = {
+    "Movies": {},  
+    "Series": set()  
+}
+
+
 # ✅ Now it will be available in all functions
 
 # Command to fetch latest movies
