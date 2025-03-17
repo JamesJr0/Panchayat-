@@ -459,17 +459,10 @@ import re
 import asyncio
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from filterdb import get_latest_movies, manual_titles
 
 # ✅ Define LANGUAGES globally
 LANGUAGES = ["Malayalam", "Tamil", "Telugu", "Kannada", "Hindi", "English", "Chinese", "Japanese", "Korean"]
-
-manual_titles = {
-    "Movies": {},  
-    "Series": set()  
-}
-
-
-# ✅ Now it will be available in all functions
 
 # Command to fetch latest movies
 @Client.on_message(filters.command("latest"))
@@ -519,36 +512,40 @@ async def send_latest_movies(client, message):
                         (season_num == latest_episodes[series_name]["season"] and episode_num > latest_episodes[series_name]["episode"])
                     ):
                         latest_episodes[series_name] = {
-                            "full_title": series,
+                            "full_title": f"• **{series_name}** {episode_tag}",
                             "season": season_num,
                             "episode": episode_num
                         }
 
         else:
             language = data.get("language", "").title()
-            combined_movies[language].update(movies)
+            for movie in movies:
+                match = re.match(r"(.+?)\s*(\d{4})?", movie)
+                title = match.group(1).strip() if match else movie
+                year = f" ({match.group(2)})" if match and match.group(2) else ""
+                combined_movies[language].add(f"{title}{year}")
 
     # Format movies list
     for lang, movies in combined_movies.items():
         if movies:
-            movie_sections.append(f"\n{lang}:\n" + "\n".join(f"• {m}" for m in sorted(movies)))
+            movie_sections.append(f"\n**{lang}:**\n" + "\n".join(f"• {m}" for m in sorted(movies)))
 
     # Format series list
     if latest_episodes:
-        series_sections.append("\n".join(f"• {ep['full_title']}" for ep in latest_episodes.values()))
+        series_sections.append("\n".join(ep["full_title"] for ep in latest_episodes.values()))
 
     if manual_titles["Series"]:
-        series_sections.append("\n".join(f"• {s}" for s in manual_titles["Series"]))
+        series_sections.append("\n".join(f"• **{s}**" for s in manual_titles["Series"]))
 
     # Combine final response
-    response = "🎬 **Latest Movies Added to Database**\n" + "\n".join(movie_sections) if movie_sections else ""
-    response += "\n\n📺 **Latest Series Added to Database**\n" + "\n".join(series_sections) if series_sections else ""
+    response = "**🎬 Latest Movies Added to Database**\n" + "\n".join(movie_sections) if movie_sections else ""
+    response += "\n\n**📺 Latest Series Added to Database**\n" + "\n".join(series_sections) if series_sections else ""
 
     if not response.strip():
         await message.reply("📭 No new movies or series found.")
         return
 
-    response += "\n\nTeam @ProSearchFather"
+    response += "\n\n**Team @ProSearchFather**"
 
     keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton("📢 Latest Updates Channel", url="https://t.me/+-a7Vk8PDrCtiYTA9")],
