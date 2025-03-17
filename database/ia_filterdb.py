@@ -266,8 +266,8 @@ def unpack_new_file_id(new_file_id):
 
 import re
 import asyncio
-from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from motor.motor_asyncio import AsyncIOMotorClient
+from pyrogram import filters
 
 # ✅ Define LANGUAGES globally
 LANGUAGES = ["Malayalam", "Tamil", "Telugu", "Kannada", "Hindi", "English", "Chinese", "Japanese", "Korean"]
@@ -281,6 +281,14 @@ manual_titles = {
     "Series": set()
 }
 
+# ✅ Connect to MongoDB
+db_client = AsyncIOMotorClient("mongodb://localhost:27017")
+db = db_client["your_database_name"]
+
+Media1 = db["media1"]
+Media2 = db["media2"]
+Media3 = db["media3"]
+
 async def get_latest_movies():
     latest_movies = {lang: set() for lang in LANGUAGES}
     latest_movies["Multi"] = set()
@@ -288,9 +296,9 @@ async def get_latest_movies():
 
     # Fetch latest 20 movies from multiple databases concurrently
     movies1, movies2, movies3 = await asyncio.gather(
-        Media1.collection.find().sort("$natural", -1).limit(20).to_list(None),
-        Media2.collection.find().sort("$natural", -1).limit(20).to_list(None),
-        Media3.collection.find().sort("$natural", -1).limit(20).to_list(None)
+        Media1.find().sort("$natural", -1).limit(20).to_list(None),
+        Media2.find().sort("$natural", -1).limit(20).to_list(None),
+        Media3.find().sort("$natural", -1).limit(20).to_list(None)
     )
 
     all_movies = movies1 + movies2 + movies3
@@ -300,8 +308,9 @@ async def get_latest_movies():
         caption = str(movie.get("caption", "")).strip()
 
         # Extract movie name and remove unnecessary encoding tags
-        match = re.search(r"(.+?)(?:\s+(\d{4}))?(?:\.\d{3,4}p|WEB-DL|HDRip|BluRay|HEVC|AAC|DDP5.1|x264|x265|H264|H265).*", file_name, re.IGNORECASE)
-        movie_name = match.group(1).strip() if match else file_name
+        match = re.match(r"(.+?)\s*(\d{4})?", file_name)
+        title = match.group(1).strip() if match else file_name
+        year = f" ({match.group(2)})" if match and match.group(2) else ""
 
         # Detect series (SXXEYY format)
         series_match = re.search(r"(.+?)\s?(S\d{1,2}E\d{1,2})", file_name, re.IGNORECASE)
@@ -322,10 +331,12 @@ async def get_latest_movies():
         detected_languages = set(re.findall(r'\b(' + '|'.join(LANGUAGES) + r')\b', caption, re.IGNORECASE))
 
         for lang in detected_languages:
-            latest_movies[lang].add(movie_name)
+            latest_movies[lang].add(f"{title}{year}")
 
         if len(detected_languages) > 1:
-            latest_movies["Multi"].add(movie_name)
+            latest_movies["Multi"].add(title)
+
+    latest_series.update(manual_titles["Series"])
 
     # Convert sets to lists and return structured data
     results = [{"language": lang, "movies": list(latest_movies[lang])[:8]} for lang in latest_movies if latest_movies[lang]]
@@ -333,5 +344,3 @@ async def get_latest_movies():
         results.append({"category": "Series", "movies": list(latest_series)[:10]})
 
     return results
-
-# ✅ Now the variable is available everywhere in the script
