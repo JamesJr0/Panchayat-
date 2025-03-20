@@ -11,23 +11,23 @@ from database.connections_mdb import active_connection
 from utils import get_file_id, parser, split_quotes
 from info import ADMINS
 
-
-@Client.on_message(filters.command(['del']) & filters.incoming & filters.user(ADMINS))
-async def deletefilter(client, message):
+@Client.on_message(filters.command(['filter', 'add']) & filters.incoming & filters.user(ADMINS))
+async def addfilter(client, message):
     userid = message.from_user.id if message.from_user else None
     if not userid:
         return await message.reply("You are anonymous admin. Use /connect {message.chat.id} in PM")
-
+    
     chat_type = message.chat.type
+    args = message.text.html.split(None, 1)
 
     if chat_type == enums.ChatType.PRIVATE:
         grpid = await active_connection(str(userid))
-        if grpid:
+        if grpid is not None:
             grp_id = grpid
             try:
                 chat = await client.get_chat(grpid)
                 title = chat.title
-            except Exception as e:
+            except:
                 await message.reply_text("Make sure I'm present in your group!!", quote=True)
                 return
         else:
@@ -42,43 +42,92 @@ async def deletefilter(client, message):
 
     st = await client.get_chat_member(grp_id, userid)
     if (
-        st.status not in [enums.ChatMemberStatus.ADMINISTRATOR, enums.ChatMemberStatus.OWNER]
+        st.status != enums.ChatMemberStatus.ADMINISTRATOR
+        and st.status != enums.ChatMemberStatus.OWNER
         and str(userid) not in ADMINS
     ):
         return
 
-    try:
-        cmd, text = message.text.split(" ", 1)
-    except ValueError:
-        await message.reply_text(
-            "<i>Mention the filter name which you want to delete!</i>\n\n"
-            "<code>/del filtername</code>\n\n"
-            "Use /viewfilters to view all available filters",
-            quote=True
-        )
+    if len(args) < 2:
+        await message.reply_text("Command Incomplete :(", quote=True)
         return
 
-    query = text.strip().lower()
+    extracted = split_quotes(args[1])
+    text = extracted[0].lower()
 
-    await delete_filter(message, query, grp_id)
+    if not message.reply_to_message and len(extracted) < 2:
+        await message.reply_text("Add some content to save your filter!", quote=True)
+        return
 
+    if len(extracted) >= 2 and not message.reply_to_message:
+        reply_text, btn, alert = parser(extracted[1], text)
+        fileid = None
+        if not reply_text:
+            await message.reply_text("You cannot have buttons alone, give some text to go with it!", quote=True)
+            return
 
-@Client.on_message(filters.command('delall') & filters.incoming)
-async def delallconfirm(client, message):
+    elif message.reply_to_message and message.reply_to_message.reply_markup:
+        try:
+            rm = message.reply_to_message.reply_markup
+            btn = rm.inline_keyboard
+            msg = get_file_id(message.reply_to_message)
+            if msg:
+                fileid = msg.file_id
+                reply_text = message.reply_to_message.caption.html
+            else:
+                reply_text = message.reply_to_message.text.html
+                fileid = None
+            alert = None
+        except:
+            reply_text = ""
+            btn = "[]"
+            fileid = None
+            alert = None
+
+    elif message.reply_to_message and message.reply_to_message.media:
+        try:
+            msg = get_file_id(message.reply_to_message)
+            fileid = msg.file_id if msg else None
+            reply_text, btn, alert = parser(extracted[1], text) if message.reply_to_message.sticker else parser(message.reply_to_message.caption.html, text)
+        except:
+            reply_text = ""
+            btn = "[]"
+            alert = None
+    elif message.reply_to_message and message.reply_to_message.text:
+        try:
+            fileid = None
+            reply_text, btn, alert = parser(message.reply_to_message.text.html, text)
+        except:
+            reply_text = ""
+            btn = "[]"
+            alert = None
+    else:
+        return
+
+    await add_filter(grp_id, text, reply_text, btn, fileid, alert)
+
+    await message.reply_text(
+        f"Filter for  `{text}`  added in  **{title}**",
+        quote=True,
+        parse_mode=enums.ParseMode.MARKDOWN
+    )
+
+@Client.on_message(filters.command('del') & filters.incoming & filters.user(ADMINS))
+async def deletefilter(client, message):
     userid = message.from_user.id if message.from_user else None
     if not userid:
-        return await message.reply(f"You are anonymous admin. Use /connect {message.chat.id} in PM")
-
+        return await message.reply("You are anonymous admin. Use /connect {message.chat.id} in PM")
+    
     chat_type = message.chat.type
 
     if chat_type == enums.ChatType.PRIVATE:
         grpid = await active_connection(str(userid))
-        if grpid:
+        if grpid is not None:
             grp_id = grpid
             try:
                 chat = await client.get_chat(grpid)
                 title = chat.title
-            except Exception as e:
+            except:
                 await message.reply_text("Make sure I'm present in your group!!", quote=True)
                 return
         else:
@@ -92,7 +141,57 @@ async def delallconfirm(client, message):
         return
 
     st = await client.get_chat_member(grp_id, userid)
-    if st.status in [enums.ChatMemberStatus.OWNER] or str(userid) in ADMINS:
+    if (
+        st.status != enums.ChatMemberStatus.ADMINISTRATOR
+        and st.status != enums.ChatMemberStatus.OWNER
+        and str(userid) not in ADMINS
+    ):
+        return
+
+    try:
+        cmd, text = message.text.split(" ", 1)
+    except:
+        await message.reply_text(
+            "<i>Mention the filtername which you wanna delete!</i>\n\n"
+            "<code>/del filtername</code>\n\n"
+            "Use /viewfilters to view all available filters",
+            quote=True
+        )
+        return
+
+    query = text.lower()
+    await delete_filter(message, query, grp_id)
+
+@Client.on_message(filters.command('delall') & filters.incoming)
+async def delallconfirm(client, message):
+    userid = message.from_user.id if message.from_user else None
+    if not userid:
+        return await message.reply("You are anonymous admin. Use /connect {message.chat.id} in PM")
+    
+    chat_type = message.chat.type
+
+    if chat_type == enums.ChatType.PRIVATE:
+        grpid = await active_connection(str(userid))
+        if grpid is not None:
+            grp_id = grpid
+            try:
+                chat = await client.get_chat(grpid)
+                title = chat.title
+            except:
+                await message.reply_text("Make sure I'm present in your group!!", quote=True)
+                return
+        else:
+            await message.reply_text("I'm not connected to any groups!", quote=True)
+            return
+
+    elif chat_type in [enums.ChatType.GROUP, enums.ChatType.SUPERGROUP]:
+        grp_id = message.chat.id
+        title = message.chat.title
+    else:
+        return
+
+    st = await client.get_chat_member(grp_id, userid)
+    if st.status == enums.ChatMemberStatus.OWNER or str(userid) in ADMINS:
         await message.reply_text(
             f"This will delete all filters from '{title}'.\nDo you want to continue??",
             reply_markup=InlineKeyboardMarkup([
@@ -101,3 +200,24 @@ async def delallconfirm(client, message):
             ]),
             quote=True
         )
+
+# Fix for `mv_rqst` error
+async def advantage_spell_chok(msg):
+    mv_rqst = msg.text.split(" ", 1)[1] if " " in msg.text else None
+
+    if not mv_rqst:
+        await msg.reply_text("❌ No valid movie request found.")
+        return
+
+    try:
+        reqst_gle = mv_rqst.replace(" ", "+")
+        movies = await get_poster(mv_rqst, bulk=True)
+
+        if not movies:
+            await msg.reply_text("❌ No movies found for your request.")
+            return
+
+        await msg.reply_text(f"🎬 Movies Found:\n{movies}")
+
+    except Exception as e:
+        await msg.reply_text(f"❌ Error occurred: {str(e)}")
