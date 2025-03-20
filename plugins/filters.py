@@ -271,3 +271,23 @@ async def delallconfirm(client, message):
             quote=True
         )
 
+
+async def advantage_spell_chok(msg):
+    if " " in msg.text:
+        mv_rqst = msg.text.split(" ", 1)[1]  # Extract movie request text
+    else:
+        await msg.reply_text("❌ No valid movie request found.")
+        return
+
+    try:
+        reqst_gle = mv_rqst.replace(" ", "+")
+        movies = await get_poster(reqst_gle, bulk=True)
+
+        if not movies:
+            await msg.reply_text("❌ No movies found for your request.")
+            return
+
+        await msg.reply_text(f"🎬 Movies Found:\n{movies}")
+
+    except Exception as e:
+        await msg.reply_text(f"❌ Error occurred: {str(e)}")
