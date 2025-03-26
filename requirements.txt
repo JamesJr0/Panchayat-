@@ -14,3 +14,4 @@ pytz
 requests
 tgcrypto
 umongo==3.0.1
+imdbpy
