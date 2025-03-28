@@ -134,26 +134,16 @@ async def get_all(client, message):
     )
 
 
-@Client.on_message(filters.command('del') & filters.incoming & filters.user(ADMINS))
-async def deletefilter(client, message):
-    try:
-        cmd, text = message.text.split(" ", 1)
-    except ValueError:
-        await message.reply_text("<i>Mention the filter name you want to delete!</i>\n\n"
-                                 "<code>/del filtername</code>\n\n"
-                                 "Use /viewfilters to view all available filters", quote=True)
-        return
-
-    await delete_filter(message, text.lower(), message.chat.id)
-
-
 async def advantage_spell_chok(msg):
     """Handles movie search requests"""
-    mv_rqst = None  # Ensure mv_rqst is always initialized
-
-    if " " in msg.text:
-        mv_rqst = msg.text.split(" ", 1)[1].strip()  # Extract movie request text
-
+    
+    if not msg.text or " " not in msg.text:
+        await msg.reply_text("❌ No valid movie request found.")
+        return
+    
+    # Extract movie request
+    mv_rqst = msg.text.split(" ", 1)[1].strip()
+    
     if not mv_rqst:
         await msg.reply_text("❌ No valid movie request found.")
         return
