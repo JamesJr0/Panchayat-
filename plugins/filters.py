@@ -137,13 +137,13 @@ async def get_all(client, message):
 async def advantage_spell_chok(msg):
     """Handles movie search requests"""
     
-    if not msg.text or " " not in msg.text:
-        await msg.reply_text("❌ No valid movie request found.")
+    if not msg.text or len(msg.text.split()) < 2:
+        await msg.reply_text("❌ Please provide a movie name after the command.")
         return
     
     # Extract movie request
-    mv_rqst = msg.text.split(" ", 1)[1].strip()
-    
+    mv_rqst = " ".join(msg.text.split()[1:]).strip()  # Handles multiple spaces properly
+
     if not mv_rqst:
         await msg.reply_text("❌ No valid movie request found.")
         return
@@ -153,10 +153,11 @@ async def advantage_spell_chok(msg):
         movies = await get_poster(reqst_gle, bulk=True)
 
         if not movies:
-            await msg.reply_text("❌ No movies found for your request.")
+            await msg.reply_text(f"❌ No movies found for '{mv_rqst}'. Please try another name.")
             return
 
-        await msg.reply_text(f"🎬 Movies Found:\n{movies}")
+        await msg.reply_text(f"🎬 Movies Found for '{mv_rqst}':\n{movies}")
 
     except Exception as e:
-        await msg.reply_text(f"❌ Error occurred: {str(e)}")
+        await msg.reply_text(f"❌ An error occurred while searching: {str(e)}")
+
