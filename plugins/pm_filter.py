@@ -789,7 +789,9 @@ async def advantage_spell_chok(msg):
         await k.delete()
         return
     movielist += [f"{movie.get('title')} {movie.get('year')}" for movie in movies]
-    SPELL_CHECK[mv_id] = movielist
+mv_id = msg.message_id  # Assigning a unique identifier from the message
+SPELL_CHECK[mv_id] = movielist
+
     btn = [
         [
             InlineKeyboardButton(
