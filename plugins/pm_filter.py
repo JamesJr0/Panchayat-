@@ -752,64 +752,84 @@ async def auto_filter(client, msg, spoll=False):
 
 
 async def advantage_spell_chok(msg):
+    mv_rqst = msg.text
     query = re.sub(
-        r"\b(pl(i|e)*?(s|z+|ease|se|ese|(e+)s(e)?)|((send|snd|giv(e)?|gib)(\sme)?)|movie(s)?|new|latest|br((o|u)h?)*|^h(e|a)?(l)*(o)*|mal(ayalam)?|t(h)?amil|file|that|find|und(o)*|kit(t(i|y)?)?o(w)?|thar(u)?(o)*w?|kittum(o)*|aya(k)*(um(o)*)?|full\smovie|any(one)|with\ssubtitle(s)?)",
-        "", msg.text, flags=re.IGNORECASE)  # plis contribute some common words
+        r"\b(pl(i|e)*?(s|z+|ease|se|ese|(e+)s(e)?)|((send|snd|giv(e)?|gib)(\sme)?)|movie(s)?|new|latest|br((o|u)h?)*|^h(e|a)?(l)*(o)*|mal(ayalam)?|t(h)?amil|file|that|find|und(o)*|kit(t(i|y)?)?o(w)?|t(h)?is|t(h)?e|t(h)?at|t(h)?e(y)?|o(n)?|a(n)?|a(n)?y|wa(s)?|were|w(a)?s|is|are)\b",
+        "", mv_rqst, flags=re.IGNORECASE
+    )
     query = query.strip() + " movie"
+
+    # Default response for when movie isn't found
+    not_found_text = (
+        "<b>‼️ FILE NOT FOUND  ‼️\n\n"
+        "1️⃣ Make Sure The Movie Is Spelled Exactly As It Is In Google..!!\n\n"
+        "2️⃣ Check If The Movie You Requested Is Released In OTT.!!\n\n"
+        "3️⃣ If You Need Help Contact The <a href='https://t.me/Pro_Searchbot'>Support Group</a> "
+        "Admins Will Help.\n\n"
+        "4️⃣ 𝖢𝗈𝗇𝗍𝖺𝖼𝗍 𝖠𝖽𝗆𝗂𝗇𝗌, 𝖲𝗈 𝖳𝗁𝖾𝗒 𝖢𝖺𝗇 𝖠𝖽𝖽 𝖥𝗂𝗅𝖾𝗌 𝖳𝗈 𝖬𝗒 𝖣𝖺𝗍𝖺𝖻𝖺𝗌𝖾 !</b>"
+    )
+    reqst_gle = mv_rqst.replace(" ", "+")
+    button = [[
+        InlineKeyboardButton('🔍 sᴇᴀʀᴄʜ ᴏɴ ɢᴏᴏɢʟᴇ 🔎', url=f"https://www.google.com/search?q={reqst_gle}")
+    ]]
+
     try:
-        movies = await get_poster(query, bulk=True)
+        movies = await get_poster(mv_rqst, bulk=True)
+        if not movies:  # Explicitly handle None or empty list
+            k = await msg.reply_text(
+                text=not_found_text,
+                reply_markup=InlineKeyboardMarkup(button),
+                reply_to_message_id=msg.id
+            )
+            await msg.delete()
+            await asyncio.sleep(60)
+            await k.delete()
+            return
+
+        movielist = [
+            f"{movie.get('title', '').strip()} {movie.get('year', '').strip()}".strip()
+            for movie in movies if movie.get('title')
+        ]
+        if not movielist:  # If movielist is empty after filtering
+            k = await msg.reply_text(
+                text=not_found_text,
+                reply_markup=InlineKeyboardMarkup(button),
+                reply_to_message_id=msg.id
+            )
+            await msg.delete()
+            await asyncio.sleep(60)
+            await k.delete()
+            return
+
+        # Spell-check logic
+        SPELL_CHECK[msg.id] = movielist  # Use msg.id instead of undefined mv_id
+        btn = [
+            [InlineKeyboardButton(text=movie_name.strip(), callback_data=f"spolling#{msg.from_user.id}#{i}")]
+            for i, movie_name in enumerate(movielist)
+        ]
+        btn.append([
+            InlineKeyboardButton(text="✘ ᴄʟᴏsᴇ ✘", callback_data=f"spolling#{msg.from_user.id}#close_spellcheck")
+        ])
+        spell_check_del = await msg.reply_text(
+            text="I Cᴏᴜʟᴅɴ'ᴛ Fɪɴᴅ Aɴʏᴛʜɪɴɢ Rᴇʟᴀᴛᴇᴅ Tᴏ Tʜᴀᴛ. Dɪᴅ Yᴏᴜ Mᴇᴀɴ Aɴʏ Oɴᴇ Oғ Tʜᴇsᴇ?",
+            reply_markup=InlineKeyboardMarkup(btn),
+            reply_to_message_id=msg.id
+        )
+        await asyncio.sleep(90)
+        await spell_check_del.delete()
+        await msg.delete()
+
     except Exception as e:
         logger.exception(e)
-        reqst_gle = query.replace(" ", "+")
-        button = [[        
-        InlineKeyboardButton('🔍 sᴇᴀʀᴄʜ ᴏɴ ɢᴏᴏɢʟᴇ​ 🔎', url=f"https://www.google.com/search?q={reqst_gle}")
-        ]]        
+        # Ensure the not-found message is sent even if an exception occurs
         k = await msg.reply_text(
-            text=("<b>I couldn't find the file you requested 😕\nTry to do the following...\n\n=> Request with correct spelling\n\n=> Don't ask movies that are not released in OTT platforms\n\n=> Try to ask in [MovieName, Language] this format.\n\n=> Use the button below to search on Google 😌</b>"),
+            text=not_found_text,
             reply_markup=InlineKeyboardMarkup(button),
             reply_to_message_id=msg.id
-        )                                           
-        await msg.delete()
-        await asyncio.sleep(60)
-        await k.delete()      
-        return
-    movielist = []
-    if not movies:
-        reqst_gle = query.replace(" ", "+")
-        button = [[        
-        InlineKeyboardButton('🔍 sᴇᴀʀᴄʜ ᴏɴ ɢᴏᴏɢʟᴇ​ 🔎', url=f"https://www.google.com/search?q={reqst_gle}")
-        ]]
-        k = await msg.reply_text(
-            text=("<b>I couldn't find the file you requested 😕\nTry to do the following...\n\n=> Request with correct spelling\n\n=> Don't ask movies that are not released in OTT platforms\n\n=> Try to ask in [MovieName, Language] this format.\n\n=> Use the button below to search on Google 😌</b>"),
-            reply_markup=InlineKeyboardMarkup(button),
-            reply_to_message_id=msg.id
-        )                                           
+        )
         await msg.delete()
         await asyncio.sleep(60)
         await k.delete()
-        return
-    movielist += [f"{movie.get('title')} {movie.get('year')}" for movie in movies]
-    mv_id = 'default_id'  # Define mv_id properly
-    mv_id = mv_id if 'mv_id' in locals() else 'default_mv_id'
-    SPELL_CHECK[mv_id] = movielist
-    btn = [
-        [
-            InlineKeyboardButton(
-                text=movie_name.strip(),
-                callback_data=f"spolling#{reqstr1}#{k}",
-            )
-        ]
-        for k, movie_name in enumerate(movielist)
-    ]
-    btn.append([InlineKeyboardButton(text="✘ ᴄʟᴏsᴇ ✘", callback_data=f'spolling#{reqstr1}#close_spellcheck')])
-    spell_check_del = await msg.reply_text(
-        text="I Cᴏᴜʟᴅɴ'ᴛ Fɪɴᴅ Aɴʏᴛʜɪɴɢ Rᴇʟᴀᴛᴇᴅ Tᴏ Tʜᴀᴛ. Dɪᴅ Yᴏᴜ Mᴇᴀɴ Aɴʏ Oɴᴇ Oғ Tʜᴇsᴇ?",
-        reply_markup=InlineKeyboardMarkup(btn),
-        reply_to_message_id=msg.id
-    )
-    await asyncio.sleep(90)
-    await spell_check_del.delete()
-    await msg.delete()
     
 
 
