@@ -110,11 +110,13 @@ async def ForceSub(bot: Client, update: Message, file_id: str = False, mode="che
 
 𝖶𝖾 𝖺𝗉𝗉𝗋𝖾𝖼𝗂𝖺𝗍𝖾 𝗒𝗈𝗎𝗋 𝖼𝗈𝗆𝗂𝗇𝗀 𝗍𝗈 𝗈𝗎𝗋 𝖻𝗈𝗍 , 𝖻𝗎𝗍 𝗒𝗈𝗎 𝗇𝖾𝖾𝖽 𝗍𝗈 𝖩𝗈𝗂𝗇 𝗈𝗎𝗋 𝗕𝗔𝗖𝗞𝗨𝗣 𝗖𝗛𝗔𝗡𝗡𝗘𝗟 𝖳𝗁𝖾𝗇 𝖼𝗅𝗂𝖼𝗄 𝗈𝗇 𝗧𝗥𝗬 𝗔𝗚𝗔𝗜𝗡 𝖡𝗎𝗍𝗍𝗈𝗇 𝖳𝗈 𝗀𝖾𝗍 𝖿𝗂𝗅𝖾𝗌.**"""
 
-        buttons = [
-            [InlineKeyboardButton("📢 𝗕𝗔𝗖𝗞𝗨𝗣 𝗖𝗛𝗔𝗡𝗡𝗘𝗟 📢", url=invite_link)],
-            [InlineKeyboardButton("🔄 Try Again 🔄", callback_data=f"{mode}#{file_id}")],
-            [InlineKeyboardButton("📌 Updates Channel", url=f"https://t.me/{AUTH_CHANNEL.lstrip('@')}")]  # Updates Channel Button
-        ]
+        updates_channel_link = "https://t.me/+p0RB9_pSWnU2Nzll"  # Your invite link
+
+buttons = [
+    [InlineKeyboardButton("📢 𝗕𝗔𝗖𝗞𝗨𝗣 𝗖𝗛𝗔𝗡𝗡𝗘𝗟 📢", url=invite_link)],
+    [InlineKeyboardButton("🔄 Try Again 🔄", callback_data=f"{mode}#{file_id}")],
+    [InlineKeyboardButton("📌 Updates Channel", url=updates_channel_link)]
+]
         
         if file_id is False:
             buttons.pop(1)  # Remove "Try Again" button if file_id is False
