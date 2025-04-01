@@ -105,30 +105,34 @@ async def ForceSub(bot: Client, update: Message, file_id: str = False, mode="che
 
             return True
 
-    except UserNotParticipant:
-        text = """**𝗛𝗼𝗹𝗱 𝗨𝗽 𝗕𝘂𝗱𝗱𝘆!!
+
+except UserNotParticipant:
+    text = """**𝗛𝗼𝗹𝗱 𝗨𝗽 𝗕𝘂𝗱𝗱𝘆!!
 
 𝖶𝖾 𝖺𝗉𝗉𝗋𝖾𝖼𝗂𝖺𝗍𝖾 𝗒𝗈𝗎𝗋 𝖼𝗈𝗆𝗂𝗇𝗀 𝗍𝗈 𝗈𝗎𝗋 𝖻𝗈𝗍 , 𝖻𝗎𝗍 𝗒𝗈𝗎 𝗇𝖾𝖾𝖽 𝗍𝗈 𝖩𝗈𝗂𝗇 𝗈𝗎𝗋 𝗕𝗔𝗖𝗞𝗨𝗣 𝗖𝗛𝗔𝗡𝗡𝗘𝗟 𝖳𝗁𝖾𝗇 𝖼𝗅𝗂𝖼𝗄 𝗈𝗇 𝗧𝗥𝗬 𝗔𝗚𝗔𝗜𝗡 𝖡𝗎𝗍𝗍𝗈𝗇 𝖳𝗈 𝗀𝖾𝗍 𝖿𝗂𝗅𝖾𝗌.**"""
 
-        updates_channel_link = "https://t.me/+p0RB9_pSWnU2Nzll"  # Your invite link
+    updates_channel_link = "https://t.me/+p0RB9_pSWnU2Nzll"
 
-buttons = [
-    [InlineKeyboardButton("📢 𝗕𝗔𝗖𝗞𝗨𝗣 𝗖𝗛𝗔𝗡𝗡𝗘𝗟 📢", url=invite_link)],
-    [InlineKeyboardButton("🔄 Try Again 🔄", callback_data=f"{mode}#{file_id}")],
-    [InlineKeyboardButton("📌 Updates Channel", url=updates_channel_link)]
-]
-        
-        if file_id is False:
-    buttons.pop()  # Ensure this line is indented properly
+    # Define buttons inside the exception block
+    buttons = [
+        [InlineKeyboardButton("📢 𝗕𝗔𝗖𝗞𝗨𝗣 𝗖𝗛𝗔𝗡𝗡𝗘𝗟 📢", url=invite_link)],
+        [InlineKeyboardButton("🔄 Try Again 🔄", callback_data=f"{mode}#{file_id}")],
+        [InlineKeyboardButton("📌 Updates Channel", url=updates_channel_link)]
+    ]
 
-        if not is_cb:
-            await update.reply(
-                text=text,
-                quote=True,
-                reply_markup=InlineKeyboardMarkup(buttons),
-                parse_mode=enums.ParseMode.MARKDOWN,
-            )
-        return False
+    if file_id is False:
+        buttons.pop()  # Corrected indentation
+
+    if not is_cb:
+        await update.reply(
+            text=text,
+            quote=True,
+            reply_markup=InlineKeyboardMarkup(buttons),
+            parse_mode=enums.ParseMode.MARKDOWN,
+        )
+
+    return False
+
 
     except FloodWait as e:
         await asyncio.sleep(e.x)
