@@ -17,11 +17,13 @@ INVITE_LINK = None
 db = JoinReqs
 
 async def ForceSub(bot: Client, update: Message, file_id: str = False, mode="checksub"):
-
+    """Forces users to join a channel before they can use the bot."""
+    
     global INVITE_LINK
     auth = ADMINS.copy() + [1125210189]
+
     if update.from_user.id in auth:
-        return True
+        return True  # Admins are exempt
 
     if not AUTH_CHANNEL and not REQ_CHANNEL:
         return True
@@ -32,44 +34,41 @@ async def ForceSub(bot: Client, update: Message, file_id: str = False, mode="che
         update = update.message
         is_cb = True
 
-    # Create Invite Link if not exists
     try:
-        # Makes the bot a bit faster and also eliminates many issues realted to invite links.
+        # Create or refresh Invite Link
         if INVITE_LINK is None:
             invite_link = (await bot.create_chat_invite_link(
                 chat_id=(int(AUTH_CHANNEL) if not REQ_CHANNEL and not JOIN_REQS_DB else REQ_CHANNEL),
                 creates_join_request=True if REQ_CHANNEL and JOIN_REQS_DB else False
             )).invite_link
             INVITE_LINK = invite_link
-            logger.info("Created Req link")
+            logger.info("Created/Refreshed Invite Link")
         else:
             invite_link = INVITE_LINK
 
     except FloodWait as e:
         await asyncio.sleep(e.x)
-        fix_ = await ForceSub(bot, update, file_id)
-        return fix_
+        return await ForceSub(bot, update, file_id)
 
     except Exception as err:
-        print(f"Unable to do Force Subscribe to {REQ_CHANNEL}\n\nError: {err}\n\n")
+        logger.exception(f"Error creating invite link: {err}")
         await update.reply(
-            text="Something went Wrong.",
+            text="Something went wrong while generating the invite link.",
             parse_mode=enums.ParseMode.MARKDOWN,
             disable_web_page_preview=True
         )
         return False
 
-    # Mian Logic
+    # Main Subscription Check
     if REQ_CHANNEL and db().isActive():
         try:
-            # Check if User is Requested to Join Channel
             user = await db().get_user(update.from_user.id)
             if user and user["user_id"] == update.from_user.id:
                 return True
         except Exception as e:
-            logger.exception(e, exc_info=True)
+            logger.exception("Database Error:", exc_info=True)
             await update.reply(
-                text="Something went Wrong.",
+                text="Something went wrong while checking your subscription.",
                 parse_mode=enums.ParseMode.MARKDOWN,
                 disable_web_page_preview=True
             )
@@ -78,37 +77,47 @@ async def ForceSub(bot: Client, update: Message, file_id: str = False, mode="che
     try:
         if not AUTH_CHANNEL:
             raise UserNotParticipant
-        # Check if User is Already Joined Channel
+
+        # Check if User is Already Joined
         user = await bot.get_chat_member(
-                   chat_id=(int(AUTH_CHANNEL) if not REQ_CHANNEL and not db().isActive() else REQ_CHANNEL), 
-                   user_id=update.from_user.id
-               )
+            chat_id=(int(AUTH_CHANNEL) if not REQ_CHANNEL and not db().isActive() else REQ_CHANNEL),
+            user_id=update.from_user.id
+        )
+
         if user.status == "kicked":
             await bot.send_message(
                 chat_id=update.from_user.id,
-                text="Sorry Sir, You are Banned to use me.",
+                text="Sorry, you are banned from using this bot.",
                 parse_mode=enums.ParseMode.MARKDOWN,
                 disable_web_page_preview=True,
                 reply_to_message_id=update.message_id
             )
             return False
-
         else:
+            # ✅ Delete Force Subscribe Message after user joins
+            try:
+                await bot.delete_messages(
+                    chat_id=update.chat.id,
+                    message_ids=[update.message_id]
+                )
+            except Exception as e:
+                logger.warning(f"Failed to delete Force Subscribe message: {e}")
+
             return True
+
     except UserNotParticipant:
-        text="""**Please Join My Updates Channel to use this Bot!**"""
+        text = """**𝗛𝗼𝗹𝗱 𝗨𝗽 𝗕𝘂𝗱𝗱𝘆!!
+
+𝖶𝖾 𝖺𝗉𝗉𝗋𝖾𝖼𝗂𝖺𝗍𝖾 𝗒𝗈𝗎𝗋 𝖼𝗈𝗆𝗂𝗇𝗀 𝗍𝗈 𝗈𝗎𝗋 𝖻𝗈𝗍 , 𝖻𝗎𝗍 𝗒𝗈𝗎 𝗇𝖾𝖾𝖽 𝗍𝗈 𝖩𝗈𝗂𝗇 𝗈𝗎𝗋 𝗕𝗔𝗖𝗞𝗨𝗣 𝗖𝗛𝗔𝗡𝗡𝗘𝗟 𝖳𝗁𝖾𝗇 𝖼𝗅𝗂𝖼𝗄 𝗈𝗇 𝗧𝗥𝗬 𝗔𝗚𝗔𝗜𝗡 𝖡𝗎𝗍𝗍𝗈𝗇 𝖳𝗈 𝗀𝖾𝗍 𝖿𝗂𝗅𝖾𝗌.**"""
 
         buttons = [
-            [
-                InlineKeyboardButton("📢 Request to Join Channel 📢", url=invite_link)
-            ],
-            [
-                InlineKeyboardButton(" 🔄 Try Again 🔄 ", callback_data=f"{mode}#{file_id}")
-            ]
+            [InlineKeyboardButton("📢 𝗕𝗔𝗖𝗞𝗨𝗣 𝗖𝗛𝗔𝗡𝗡𝗘𝗟 📢", url=invite_link)],
+            [InlineKeyboardButton("🔄 Try Again 🔄", callback_data=f"{mode}#{file_id}")],
+            [InlineKeyboardButton("📌 Updates Channel", url=f"https://t.me/{AUTH_CHANNEL.lstrip('@')}")]  # Updates Channel Button
         ]
         
         if file_id is False:
-            buttons.pop()
+            buttons.pop(1)  # Remove "Try Again" button if file_id is False
 
         if not is_cb:
             await update.reply(
@@ -121,13 +130,12 @@ async def ForceSub(bot: Client, update: Message, file_id: str = False, mode="che
 
     except FloodWait as e:
         await asyncio.sleep(e.x)
-        fix_ = await ForceSub(bot, update, file_id)
-        return fix_
+        return await ForceSub(bot, update, file_id)
 
     except Exception as err:
-        print(f"Something Went Wrong! Unable to do Force Subscribe.\nError: {err}")
+        logger.exception(f"Subscription check failed: {err}")
         await update.reply(
-            text="Something went Wrong.",
+            text="Something went wrong while checking your subscription.",
             parse_mode=enums.ParseMode.MARKDOWN,
             disable_web_page_preview=True
         )
@@ -135,6 +143,6 @@ async def ForceSub(bot: Client, update: Message, file_id: str = False, mode="che
 
 
 def set_global_invite(url: str):
+    """Updates the global invite link."""
     global INVITE_LINK
     INVITE_LINK = url
-
