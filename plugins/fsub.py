@@ -119,7 +119,7 @@ buttons = [
 ]
         
         if file_id is False:
-    buttons.pop()
+    buttons.pop()  # Ensure this line is indented properly
 
         if not is_cb:
             await update.reply(
