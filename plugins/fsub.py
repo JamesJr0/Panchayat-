@@ -119,7 +119,7 @@ buttons = [
 ]
         
         if file_id is False:
-            buttons.pop(1)  # Remove "Try Again" button if file_id is False
+    buttons.pop()
 
         if not is_cb:
             await update.reply(
