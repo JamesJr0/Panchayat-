@@ -42,7 +42,7 @@ async def save_group(bot, message):
         ]]
         reply_markup=InlineKeyboardMarkup(buttons)
         await message.reply_text(
-                        text=f"<b> ⚠️ You can't Use @ProSearchFatherBot in Groups for Searching Movies/Series!\n\nYou Can Use @Bae_Suzzy_Bot for Searching Files in Groups Easily, @ProSearchFatherBot is Specially Designed For PM Search..\n\n Team @ProSearchFather !</b>",
+                        text=f"<b> ⚠️ You can't Use @ProSearchFatherBot in Groups for Searching Movies/Series!\n\nYou Can Use @ProSearchMoviez_Bot for Searching Files in Groups Easily, @ProSearchFatherBot is Specially Designed For PM Search..\n\n Team @ProSearchFather !</b>",
             reply_markup=reply_markup)
     else:
         settings = await get_settings(message.chat.id)
