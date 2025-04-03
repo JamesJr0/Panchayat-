@@ -54,7 +54,7 @@ JOIN_REQS_DB = environ.get("JOIN_REQS_DB", DATABASE_URI1)
 UPDATES_CHANNEL = environ.get('UPDATES_CHANNEL', "https://t.me/+6guhTe_AHh44ODY1")
 MOVIE_GROUP = environ.get('MOVIE_GROUP', "https://t.me/+FTt3LaNOvYk1ZWY1")
 LATEST_UPLOADS = environ.get('LATEST_UPLOADS', "https://t.me/+-a7Vk8PDrCtiYTA9")
-MOVIE_BOT = environ.get('MOVIE_BOT', "http://t.me/bae_suzzy_bot?start=help")
+MOVIE_BOT = environ.get('MOVIE_BOT', "http://t.me/ProSearchMoviez_bot?start=help")
 
 # Others
 LOG_CHANNEL = int(environ.get('LOG_CHANNEL', '-1002130571317'))
