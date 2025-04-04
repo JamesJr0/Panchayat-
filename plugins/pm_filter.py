@@ -729,7 +729,7 @@ async def auto_filter(client, msg, spoll=False):
             **locals()
         )
     else:
-        cap = f"<b>Hai 👋 {message.from_user.mention}</b> 😍\n\n<b>📁 Found ✨  Files For Your Query : #{search} 👇</b>"
+        cap = f"<b>Hey {message.from_user.mention}</b> 😍\n\n<b>✅️ 𝖧𝖾𝗋𝖾 𝖨𝗌 𝖶𝗁𝖺𝗍 𝖨 𝖥𝗈𝗎𝗇𝖽 𝖥𝗈𝗋 𝖸𝗈𝗎𝗋 𝖰𝗎𝖾𝗋𝗒 : <blockquote>{search}</blockquote> 👇</b>"
     if imdb and imdb.get('poster'):
         try:
             fmsg = await message.reply_photo('https://graph.org/file/b7bfe0352ba19d3c0d21d.jpg', caption=cap[:1024],
