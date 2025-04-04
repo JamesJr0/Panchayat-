@@ -185,16 +185,23 @@ async def generate_post(client, message):
 
     title = " ".join(user_input)
 
-    # Format button URL (Movie or Series)
+    # Format button URLs (Movie or Series)
     formatted_title = title.replace(" ", "_").replace(".", "_")
     
     if season_identifier:
-        button_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}_{season_identifier}"
+        button1_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}_{season_identifier}"
+        button2_url = f"http://t.me/ProSearchMoviez_Bot?start=search_{formatted_title}_{season_identifier}"
     else:
-        button_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}_{year}" if year else f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}"
+        button1_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}_{year}" if year else f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}"
+        button2_url = f"http://t.me/ProSearchMoviez_Bot?start=search_{formatted_title}_{year}" if year else f"http://t.me/ProSearchMoviez_Bot?start=search_{formatted_title}"
 
+    # Create keyboard with two buttons on first line and updates button on second line
     keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("🔎 Click Here To Search 🔍", url=button_url)]
+        [
+            InlineKeyboardButton("🔎 Search Now", url=button1_url),
+            InlineKeyboardButton("🔎 Go Search", url=button2_url)
+        ],
+        [InlineKeyboardButton("🤖 BOT UPDATES 🤖", url="https://t.me/+p0RB9_pSWnU2Nzll")]
     ])
 
     # Fetch IMDb data from Cinemagoer, using year if available
