@@ -7,7 +7,7 @@ from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.enums import ParseMode
 from imdb import Cinemagoer
-from info import ADMINS  
+from info import ADMINS
 
 # Initialize Cinemagoer
 ia = Cinemagoer()
@@ -39,7 +39,8 @@ async def get_movie_details(title, year=None):
             'genres': list_to_str(movie.get("genres")),
             'rating': str(movie.get("rating")),
             'runtime': list_to_str(movie.get("runtimes")),
-            'cast': list_to_str(movie.get("cast"), limit=2),  # Only top 2 main cast members
+            'cast': list_to_str(movie.get("cast"), limit=2),
+            'language': list_to_str(movie.get("languages")),
             'imdb_url': f'https://www.imdb.com/title/tt{movieid}'
         }
 
@@ -59,13 +60,20 @@ async def generate_post(client, message):
 
     user_input = message.command[1:]
     year = None
+
+    # Extract year from input
     for item in user_input:
         if item.isdigit() and len(item) == 4:
             year = item
             user_input.remove(item)
             break
 
-    title = " ".join(user_input)
+    # Remove known language names
+    language_keywords = ['hindi', 'tamil', 'telugu', 'malayalam', 'kannada', 'english', 'bengali']
+    cleaned_input = [w for w in user_input if w.lower().strip(',') not in language_keywords]
+
+    title = " ".join(cleaned_input)
+
     movie_data = await get_movie_details(title, year)
 
     if movie_data:
@@ -74,13 +82,18 @@ async def generate_post(client, message):
         runtime = movie_data["runtime"]
         rating = movie_data["rating"]
         cast = movie_data["cast"]
-        search_query = title.replace(' ', '_')
+        language = movie_data["language"]
+        year = movie_data["year"] or year
+
+        # Deep link with title + year only
+        search_query = re.sub(r'\s+', '_', f"{title} {year}").strip()
 
         message_text = f"""
-<b>✅ {title} {year if year else ""}</b>
+<b>✅ {title} {year}</b>
 
 ⭐️ <b><a href="{imdb_url}">IMDB info</a></b>  
 🎭 Genre: {genre}  
+🗣️ Language: {language}  
 ⏳ Runtime: {runtime} min  
 ⭐ Rating: {rating}  
 🎭 Cast: {cast}  
@@ -88,7 +101,7 @@ async def generate_post(client, message):
 
         keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton("🔎 Click Here To Search 🔍", url=f"http://t.me/Prosearchfatherbot?start=search_{search_query}")],
-            [InlineKeyboardButton("📌 Try Alternate Bot", url=f"http://t.me/ProsearchMoviez_bot?start=search_{search_query}")]
+            [InlineKeyboardButton("📌 Search to ProSearchMoviez", url=f"http://t.me/ProsearchMoviez_bot?start=search_{search_query}")]
         ])
 
         await client.send_message(
@@ -98,6 +111,6 @@ async def generate_post(client, message):
             parse_mode=ParseMode.HTML, 
             disable_web_page_preview=True
         )
-        await message.reply_text(f"The post for '{title} {year if year else ''}' has been published!")
+        await message.reply_text(f"The post for '{title} {year}' has been published!")
     else:
         await message.reply_text("Movie not found.")
