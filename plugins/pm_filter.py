@@ -441,6 +441,7 @@ async def cb_handler(client: Client, query: CallbackQuery):
     )
     await query.answer('Piracy Is Crime')
 
+
     elif query.data == "help":
         buttons = [
             [
