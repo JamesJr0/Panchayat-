@@ -425,18 +425,26 @@ async def cb_handler(client: Client, query: CallbackQuery):
     elif query.data == "pages":
         await query.answer()
     elif query.data == "start":
-        buttons = [[
-      
-            InlineKeyboardButton('😊 About', callback_data='about'),
+    buttons = [
+        [
+            InlineKeyboardButton('😊 About', callback_data='about')
+        ],
+        [
+            InlineKeyboardButton('🤖 BOT UPDATES 🤖', url='https://t.me/+p0RB9_pSWnU2Nzll'),
+            InlineKeyboardButton('🎬 OTT UPDATES 📽️', url='https://t.me/ProSearchFather')
+        ],
+        [
             InlineKeyboardButton('🔒 Close', callback_data='close_data')
-        ]]
-        reply_markup = InlineKeyboardMarkup(buttons)
-        await query.message.edit_text(
-            text=script.START_TXT.format(query.from_user.mention, temp.U_NAME, temp.B_NAME),
-            reply_markup=reply_markup,
-            parse_mode=enums.ParseMode.HTML
-        )
-        await query.answer('Piracy Is Crime')
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(buttons)
+    await query.message.edit_text(
+        text=script.START_TXT.format(query.from_user.mention, temp.U_NAME, temp.B_NAME),
+        reply_markup=reply_markup,
+        parse_mode=enums.ParseMode.HTML
+    )
+    await query.answer('Piracy Is Crime')
+
     elif query.data == "help":
         buttons = [
             [
