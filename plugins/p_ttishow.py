@@ -3,7 +3,7 @@ from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from pyrogram.errors.exceptions.bad_request_400 import MessageTooLong, PeerIdInvalid
 from info import ADMINS, LOG_CHANNEL, MELCOW_NEW_USERS
 from database.users_chats_db import db
-from database.ia_filterdb import Media1, Media2, Media3, db1 as clientDB1, db2 as clientDB2, db3 as clientDB3
+from database.ia_filterdb import Media1, Media2, Media3, Media4, db1 as clientDB1, db2 as clientDB2, db3 as clientDB3, db4 as clientDB4
 from utils import get_size, temp, get_settings
 from Script import script
 from pyrogram.errors import ChatAdminRequired
@@ -143,13 +143,14 @@ async def re_enable_chat(bot, message):
     await message.reply("Chat Successfully re-enabled")
 
 
-@Client.on_message(filters.command('stats')  & filters.incoming & filters.user((ADMINS.copy() + [567835245])))
+@Client.on_message(filters.command(['stats', 's'])  & filters.incoming & filters.user((ADMINS.copy() + [567835245])))
 async def get_ststs(bot, message):
-    rju = await message.reply('Fetching stats..')
+    kc = await message.reply('Fetching stats..')
     tot1 = await Media1.count_documents()
     tot2 = await Media2.count_documents()
     tot3 = await Media3.count_documents()
-    total = tot1 + tot2 + tot3
+    tot4 = await Media4.count_documents()
+    total = tot1 + tot2 + tot3 + tot4
     users = await db.total_users_count()
     chats = await db.total_chat_count()
     stats1 = await clientDB1.command('dbStats')
@@ -158,7 +159,9 @@ async def get_ststs(bot, message):
     used_dbSize2 = (stats2['dataSize']/(1024*1024))+(stats2['indexSize']/(1024*1024)) 
     stats3 = await clientDB3.command('dbStats')
     used_dbSize3 = (stats3['dataSize']/(1024*1024))+(stats3['indexSize']/(1024*1024)) 
-    await rju.edit(script.STATUS_TXT.format(total, users, chats, tot1, round(used_dbSize1, 2), tot2, round(used_dbSize2, 2), tot3, round(used_dbSize3, 2)))
+    stats4 = await clientDB4.command('dbStats')
+    used_dbSize4 = (stats4['dataSize']/(1024*1024))+(stats4['indexSize']/(1024*1024)) 
+    await kc.edit(script.STATUS_TXT.format(total, users, chats, tot1, round(used_dbSize1, 2), tot2, round(used_dbSize2, 2), tot3, round(used_dbSize3, 2), tot4, round(used_dbSize4, 2)))
 
 
 # a function for trespassing into others groups, Inspired by a Vazha

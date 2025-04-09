@@ -7,7 +7,7 @@ from Script import script
 from pyrogram import Client, filters, enums
 from pyrogram.errors import ChatAdminRequired, FloodWait
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
-from database.ia_filterdb import Media1, Media2, Media3, get_file_details, unpack_new_file_id
+from database.ia_filterdb import Media1, Media2, Media3, Media4, get_file_details, unpack_new_file_id
 from database.users_chats_db import db
 from info import CHANNELS, ADMINS, AUTH_CHANNEL, LOG_CHANNEL, PICS, START_IMAGE_URL, UPDATES_CHANNEL, BATCH_FILE_CAPTION, CUSTOM_FILE_CAPTION, PROTECT_CONTENT
 from utils import get_settings, get_size, is_subscribed, save_group_settings, temp
@@ -299,12 +299,15 @@ async def delete(bot, message):
     result_media1 = await Media1.collection.find_one({'_id': file_id})
     result_media2 = await Media2.collection.find_one({'_id': file_id})   
     result_media3 = await Media3.collection.find_one({'_id': file_id})   
+    result_media4 = await Media4.collection.find_one({'_id': file_id})   
     if result_media1:
         await Media1.collection.delete_one({'_id': file_id})
     elif result_media2:
         await Media2.collection.delete_one({'_id': file_id})
     elif result_media3:
         await Media3.collection.delete_one({'_id': file_id})
+    elif result_media4:
+        await Media4.collection.delete_one({'_id': file_id})
     else:
         await msg.edit('File not found in the database')
         return
@@ -338,6 +341,7 @@ async def delete_all_index_confirm(bot, message):
     await Media1.collection.drop()
     await Media2.collection.drop()
     await Media3.collection.drop()
+    await Media4.collection.drop()
     await message.answer('Piracy Is Crime')
     await message.message.edit('Succesfully Deleted All The Indexed Files.')
 

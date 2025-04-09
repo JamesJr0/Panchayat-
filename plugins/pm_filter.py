@@ -542,7 +542,8 @@ async def cb_handler(client: Client, query: CallbackQuery):
         tot1 = await Media1.count_documents()
         tot2 = await Media2.count_documents()
         tot3 = await Media3.count_documents()
-        total = tot1 + tot2 + tot3
+        tot4 = await Media4.count_documents()
+        total = tot1 + tot2 + tot3 + tot4
         users = await db.total_users_count()
         chats = await db.total_chat_count()
         stats1 = await clientDB1.command('dbStats')
@@ -551,8 +552,10 @@ async def cb_handler(client: Client, query: CallbackQuery):
         used_dbSize2 = (stats2['dataSize']/(1024*1024))+(stats2['indexSize']/(1024*1024)) 
         stats3 = await clientDB3.command('dbStats')
         used_dbSize3 = (stats3['dataSize']/(1024*1024))+(stats3['indexSize']/(1024*1024)) 
+        stats4 = await clientDB4.command('dbStats')
+        used_dbSize4 = (stats4['dataSize']/(1024*1024))+(stats4['indexSize']/(1024*1024)) 
         await query.message.edit_text(
-            text=script.STATUS_TXT.format(total, users, chats, tot1, round(used_dbSize1, 2), tot2, round(used_dbSize2, 2), tot3, round(used_dbSize3, 2)),
+            text=script.STATUS_TXT.format(total, users, chats, tot1, round(used_dbSize1, 2), tot2, round(used_dbSize2, 2), tot3, round(used_dbSize3, 2), tot4, round(used_dbSize4, 2)),
             reply_markup=reply_markup,
             parse_mode=enums.ParseMode.HTML
         )
@@ -566,7 +569,8 @@ async def cb_handler(client: Client, query: CallbackQuery):
         tot1 = await Media1.count_documents()
         tot2 = await Media2.count_documents()
         tot3 = await Media3.count_documents()
-        total = tot1 + tot2 + tot3
+        tot4 = await Media4.count_documents()
+        total = tot1 + tot2 + tot3 + tot4
         users = await db.total_users_count()
         chats = await db.total_chat_count()
         stats1 = await clientDB1.command('dbStats')
@@ -575,8 +579,10 @@ async def cb_handler(client: Client, query: CallbackQuery):
         used_dbSize2 = (stats2['dataSize']/(1024*1024))+(stats2['indexSize']/(1024*1024)) 
         stats3 = await clientDB3.command('dbStats')
         used_dbSize3 = (stats3['dataSize']/(1024*1024))+(stats3['indexSize']/(1024*1024)) 
+        stats4 = await clientDB4.command('dbStats')
+        used_dbSize4 = (stats4['dataSize']/(1024*1024))+(stats4['indexSize']/(1024*1024)) 
         await query.message.edit_text(
-            text=script.STATUS_TXT.format(total, users, chats, tot1, round(used_dbSize1, 2), tot2, round(used_dbSize2, 2), tot3, round(used_dbSize3, 2)),
+            text=script.STATUS_TXT.format(total, users, chats, tot1, round(used_dbSize1, 2), tot2, round(used_dbSize2, 2), tot3, round(used_dbSize3, 2), tot4, round(used_dbSize4, 2)),
             reply_markup=reply_markup,
             parse_mode=enums.ParseMode.HTML
         )

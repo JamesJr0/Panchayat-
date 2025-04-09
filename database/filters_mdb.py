@@ -1,11 +1,11 @@
 import pymongo
-from info import DATABASE_URI1, DATABASE_NAME
+from info import USERS_DB, DATABASE_NAME
 from pyrogram import enums
 import logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)
 
-myclient = pymongo.MongoClient(DATABASE_URI1)
+myclient = pymongo.MongoClient(USERS_DB)
 mydb = myclient[DATABASE_NAME]
 
 

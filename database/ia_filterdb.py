@@ -11,17 +11,21 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 
-client1 = AsyncIOMotorClient(DATABASE_URI1)
+client1 = AsyncIOMotorClient(FILES_DB1)
 db1 = client1[DATABASE_NAME]
 instance1 = Instance.from_db(db1)
 
-client2 = AsyncIOMotorClient(DATABASE_URI2)
+client2 = AsyncIOMotorClient(FILES_DB2)
 db2 = client2[DATABASE_NAME]
 instance2 = Instance.from_db(db2)
 
-client3 = AsyncIOMotorClient(DATABASE_URI3)
+client3 = AsyncIOMotorClient(FILES_DB3)
 db3 = client3[DATABASE_NAME]
 instance3 = Instance.from_db(db3)
+
+client4 = AsyncIOMotorClient(FILES_DB4)
+db4 = client4[DATABASE_NAME]
+instance4 = Instance.from_db(db4)
 
 @instance1.register
 class Media1(Document):
@@ -65,6 +69,20 @@ class Media3(Document):
         indexes = ('$file_name', )
         collection_name = COLLECTION_NAME
 
+@instance4.register
+class Media4(Document):
+    file_id = fields.StrField(attribute='_id')
+    file_ref = fields.StrField(allow_none=True)
+    file_name = fields.StrField(required=True)
+    file_size = fields.IntField(required=True)
+    file_type = fields.StrField(allow_none=True)
+    mime_type = fields.StrField(allow_none=True)
+    caption = fields.StrField(allow_none=True)
+
+    class Metaa:
+        indexes = ('$file_name', )
+        collection_name = COLLECTION_NAME
+
 async def check_file(media):
     """Check if file is present in any of the media collections"""
 
@@ -72,7 +90,7 @@ async def check_file(media):
     file_id, file_ref = unpack_new_file_id(media.file_id)
     
     # List of collections to check
-    collections = [Media1.collection, Media2.collection, Media3.collection]
+    collections = [Media1.collection, Media2.collection, Media3.collection, Media4.collection]
     
     # Check each collection for the file_id
     for collection in collections:
@@ -170,6 +188,35 @@ async def save_file3(media):
             logger.info(f'{getattr(media, "file_name", "NO_FILE")} is saved to DB 3')
             return True, 1
 
+async def save_file4(media):
+    """Save file in database"""
+    file_id, file_ref = unpack_new_file_id(media.file_id)
+    file_name = re.sub(r"(_|\-|\.|\+)", " ", str(media.file_name))
+    try:
+        file = Media3(
+            file_id=file_id,
+            file_ref=file_ref,
+            file_name=file_name,
+            file_size=media.file_size,
+            file_type=media.file_type,
+            mime_type=media.mime_type,
+            caption=media.caption.html if media.caption else None,
+        )
+    except ValidationError:
+        logger.exception('Error occurred while saving file in DB 4')
+        return False, 2
+    else:
+        try:
+            await file.commit()
+        except DuplicateKeyError:      
+            logger.warning(
+                f'{getattr(media, "file_name", "NO_FILE")} is already saved in DB 4'
+            )
+            return False, 0
+        else:
+            logger.info(f'{getattr(media, "file_name", "NO_FILE")} is saved to DB 4')
+            return True, 1
+
 async def get_search_results(query, file_type=None, max_results=10, offset=0, filter=False):
     """For given query return (results, next_offset)"""
 
@@ -192,7 +239,7 @@ async def get_search_results(query, file_type=None, max_results=10, offset=0, fi
         filter['file_type'] = file_type
 
     # Query multiple media collections asynchronously
-    collections = [Media1, Media2, Media3]
+    collections = [Media1, Media2, Media3, Media4]
     cursors = [collection.find(filter).sort('$natural', -1) for collection in collections]
 
     # Ensure offset is non-negative
@@ -222,7 +269,7 @@ async def get_search_results(query, file_type=None, max_results=10, offset=0, fi
 
 async def get_file_details(query):
     filter = {'file_id': query}
-    media_collections = [Media1, Media2, Media3]
+    media_collections = [Media1, Media2, Media3, Media4]
 
     for media in media_collections:
         cursor = media.find(filter)
