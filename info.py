@@ -36,7 +36,7 @@ auth_grp = environ.get('AUTH_GROUP')
 AUTH_GROUPS = [int(ch) for ch in auth_grp.split()] if auth_grp else None
 
 # MongoDB information
-USERS_DB = environ.get('USERS_DB', "mongodb+srv://shibu:iCcuN8t4huNvi4Qy@suzzy.jnxmryf.mongodb.net/?retryWrites=true&w=majority")
+USERS_DB = environ.get('USERS_DB', "")
 FILES_DB1 = environ.get('FILES_DB1', "")
 FILES_DB2 = environ.get('FILES_DB2', "")
 FILES_DB3 = environ.get('FILES_DB3', "")
