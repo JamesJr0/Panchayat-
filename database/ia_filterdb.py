@@ -130,12 +130,12 @@ async def save_file1(media):
             logger.info(f'{getattr(media, "file_name", "NO_FILE")} is saved to DB 1')
             return True, 1
 
-async def save_file2(media):
+async def save_file3(media):
     """Save file in database"""
     file_id, file_ref = unpack_new_file_id(media.file_id)
     file_name = re.sub(r"(_|\-|\.|\+)", " ", str(media.file_name))
     try:
-        file = Media2(
+        file = Media3(
             file_id=file_id,
             file_ref=file_ref,
             file_name=file_name,
@@ -145,18 +145,18 @@ async def save_file2(media):
             caption=media.caption.html if media.caption else None,
         )
     except ValidationError:
-        logger.exception('Error occurred while saving file in DB 2')
+        logger.exception('Error occurred while saving file in DB 3')
         return False, 2
     else:
         try:
             await file.commit()
         except DuplicateKeyError:      
             logger.warning(
-                f'{getattr(media, "file_name", "NO_FILE")} is already saved in DB 2'
+                f'{getattr(media, "file_name", "NO_FILE")} is already saved in DB 3'
             )
             return False, 0
         else:
-            logger.info(f'{getattr(media, "file_name", "NO_FILE")} is saved to DB 2')
+            logger.info(f'{getattr(media, "file_name", "NO_FILE")} is saved to DB 3')
             return True, 1
 
 async def save_file4(media):
