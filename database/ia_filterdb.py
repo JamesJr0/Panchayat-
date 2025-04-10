@@ -193,7 +193,7 @@ async def save_file4(media):
     file_id, file_ref = unpack_new_file_id(media.file_id)
     file_name = re.sub(r"(_|\-|\.|\+)", " ", str(media.file_name))
     try:
-        file = Media3(
+        file = Media4(
             file_id=file_id,
             file_ref=file_ref,
             file_name=file_name,
