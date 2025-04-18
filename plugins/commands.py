@@ -459,3 +459,63 @@ async def settings(client, message):
         )
 
 
+@Client.on_message(filters.command("deletefiles") & filters.user(ADMINS))
+async def deletemultiplefiles(bot, message):
+    """Prompt user to confirm deletion of files by name"""
+    chat_type = message.chat.type
+    if chat_type != enums.ChatType.PRIVATE:
+        return await message.reply_text(f"<b>Hey {message.from_user.mention}, This command won't work in groups. It only works on my PM!</b>")
+
+    try:
+        keyword = message.text.split(" ", 1)[1].strip()
+    except:
+        return await message.reply_text(f"<b>Hey {message.from_user.mention}, Give me a keyword along with the command to delete files.</b>")
+
+    k = await bot.send_message(chat_id=message.chat.id, text=f"<b>Fetching files for your query '{keyword}' in the database... Please wait...</b>")
+
+    # Search for matching files
+    files = []
+    for media_collection in [Media1, Media2, Media3, Media4, Media5]:
+        files += await media_collection.collection.find({"file_name": {"$regex": keyword, "$options": "i"}}).to_list(None)
+
+    total = len(files)
+    await k.delete()
+
+    if total == 0:
+        return await message.reply_text(f"<b>No files found matching '{keyword}'.</b>")
+
+    # Encode keyword to prevent issues in callback data
+    encoded_keyword = urllib.parse.quote(keyword)
+
+    # Confirmation buttons
+    btn = [
+        [InlineKeyboardButton("✅ Yes, Continue!", callback_data=f"confirm_deletefiles#{encoded_keyword}")],
+        [InlineKeyboardButton("❌ No, Abort!", callback_data="abort_deletefiles")]
+    ]
+
+    await message.reply_text(
+        text=f"<b>Found {total} files for your query '{keyword}'!\n\nDo you want to delete them?</b>",
+        reply_markup=InlineKeyboardMarkup(btn),
+        parse_mode=enums.ParseMode.HTML
+    )
+
+
+@Client.on_callback_query(filters.regex(r"^confirm_deletefiles#(.+)"))
+async def confirm_delete_files(bot, query: CallbackQuery):
+    """Handle confirmation to delete files efficiently"""
+    encoded_keyword = query.data.split("#", 1)[1]
+    keyword = urllib.parse.unquote(encoded_keyword)
+
+    deleted_count = 0
+    for media_collection in [Media1, Media2, Media3, Media4, Media5]:
+        result = await media_collection.collection.delete_many({"file_name": {"$regex": keyword, "$options": "i"}})
+        deleted_count += result.deleted_count
+
+    await query.message.edit_text(f"✅ Successfully deleted {deleted_count} file(s) matching '{keyword}'.")
+
+
+@Client.on_callback_query(filters.regex(r"^abort_deletefiles$"))
+async def abort_delete_files(bot, query: CallbackQuery):
+    """Handle cancellation of file deletion"""
+    await query.message.edit_text("❌ File deletion aborted.")
+
