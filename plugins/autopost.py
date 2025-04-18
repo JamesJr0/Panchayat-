@@ -193,7 +193,7 @@ async def generate_post(client, message):
         button2_url = f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}_{season_identifier}"
     else:
         button1_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}_{year}" if year else f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}"
-        button2_url = f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}_{year}" if year else f"http://t.me/ProSearchMoviez_Bot?start=search_{formatted_title}"
+        button2_url = f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}_{year}" if year else f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}"
 
     # Create keyboard with two buttons on first line and updates button on second line
     keyboard = InlineKeyboardMarkup([
