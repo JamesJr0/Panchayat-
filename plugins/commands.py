@@ -475,7 +475,7 @@ async def deletemultiplefiles(bot, message):
 
     # Search for matching files
     files = []
-    for media_collection in [Media1, Media2, Media3, Media4, Media5]:
+    for media_collection in [Media1, Media2, Media3, Media4]:
         files += await media_collection.collection.find({"file_name": {"$regex": keyword, "$options": "i"}}).to_list(None)
 
     total = len(files)
@@ -507,7 +507,7 @@ async def confirm_delete_files(bot, query: CallbackQuery):
     keyword = urllib.parse.unquote(encoded_keyword)
 
     deleted_count = 0
-    for media_collection in [Media1, Media2, Media3, Media4, Media5]:
+    for media_collection in [Media1, Media2, Media3, Media4]:
         result = await media_collection.collection.delete_many({"file_name": {"$regex": keyword, "$options": "i"}})
         deleted_count += result.deleted_count
 
