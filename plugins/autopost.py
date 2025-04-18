@@ -190,16 +190,16 @@ async def generate_post(client, message):
     
     if season_identifier:
         button1_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}_{season_identifier}"
-        button2_url = f"http://t.me/ProSearchMoviez_Bot?start=search_{formatted_title}_{season_identifier}"
+        button2_url = f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}_{season_identifier}"
     else:
         button1_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}_{year}" if year else f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}"
-        button2_url = f"http://t.me/ProSearchMoviez_Bot?start=search_{formatted_title}_{year}" if year else f"http://t.me/ProSearchMoviez_Bot?start=search_{formatted_title}"
+        button2_url = f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}_{year}" if year else f"http://t.me/ProSearchMoviez_Bot?start=search_{formatted_title}"
 
     # Create keyboard with two buttons on first line and updates button on second line
     keyboard = InlineKeyboardMarkup([
         [
-            InlineKeyboardButton("🔎 Search Now", url=button1_url),
-            InlineKeyboardButton("🔎 Go Search", url=button2_url)
+            InlineKeyboardButton("🥀 Pro Search 🌼", url=button1_url),
+            InlineKeyboardButton("🌿 Go Search🌸", url=button2_url)
         ],
         [InlineKeyboardButton("🤖 BOT UPDATES 🤖", url="https://t.me/+p0RB9_pSWnU2Nzll")]
     ])
