@@ -1,14 +1,12 @@
 import re
-import aiohttp
 import asyncio
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.enums import ParseMode
 from imdb import Cinemagoer
 from info import CHANNELS, ADMINS, LOG_CHANNEL
-from database.ia_filterdb import save_file, unpack_new_file_id
+from database.ia_filterdb import save_file1, unpack_new_file_id
 from utils import temp
-from database.users_chats_db import db
 
 # Initialize Cinemagoer
 ia = Cinemagoer()
@@ -139,8 +137,8 @@ async def media(bot, message):
     if media.mime_type in ['video/mp4', 'video/x-matroska']:
         media.file_type = message.media.value
         media.caption = message.caption
-        success_sts = await save_file(media)
-        if success_sts == 'suc':
+        success, status = await save_file1(media)
+        if success:
             file_id, file_ref = unpack_new_file_id(media.file_id)
             await send_movie_updates(bot, file_name=media.file_name, caption=media.caption, file_id=file_id)
 
