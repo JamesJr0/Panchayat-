@@ -5,7 +5,7 @@ from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.enums import ParseMode
 from imdb import Cinemagoer
-from info import CHANNELS, MOVIE_UPDATE_CHANNEL, ADMINS, LOG_CHANNEL
+from info import CHANNELS, ADMINS, LOG_CHANNEL
 from database.ia_filterdb import save_file, unpack_new_file_id
 from utils import temp
 from database.users_chats_db import db
