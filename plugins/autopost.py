@@ -172,12 +172,15 @@ async def send_movie_updates(bot, file_name, caption, file_id):
         processed_movies.add(movie_name)
         season_identifier = f"S{season.zfill(2)}" if season else None
         formatted_title = movie_name.replace(" ", "_").replace(".", "_")
+        # Remove season from formatted_title if present to avoid duplication
+        if season_identifier and season_identifier in formatted_title:
+            formatted_title = formatted_title[:formatted_title.rfind(season_identifier)].rstrip("_")
         if season_identifier:
             button1_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}_{season_identifier}"
             button2_url = f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}_{season_identifier}"
         else:
-            button1_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}"
-            button2_url = f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}"
+            button1_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}_{year}" if year else f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}"
+            button2_url = f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}_{year}" if year else f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}"
         keyboard = InlineKeyboardMarkup([
             [
                 InlineKeyboardButton("🥀 Pro Search 🌼", url=button1_url),
@@ -190,7 +193,7 @@ async def send_movie_updates(bot, file_name, caption, file_id):
             imdb_url = movie_data["imdb_url"]
             genre = movie_data["genre"]
             message_text = f"""
-<b>✅ {movie_name} {season_identifier if season_identifier else year if year else ""}</b>
+<b>✅ {movie_name}</b>
 
 <b><blockquote>🎙 {language}</blockquote></b>
 
@@ -199,7 +202,7 @@ async def send_movie_updates(bot, file_name, caption, file_id):
 """
         else:
             message_text = f"""
-<b>✅ {movie_name} {season_identifier if season_identifier else year if year else ""}</b>
+<b>✅ {movie_name}</b>
 
 <blockquote><b>🎙 {language}</b></blockquote>
 """
