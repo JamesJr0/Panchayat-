@@ -1,30 +1,34 @@
 import re
 import aiohttp
 import asyncio
-from io import BytesIO
-from PIL import Image
 from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.enums import ParseMode
 from imdb import Cinemagoer
-from info import ADMINS  # Importing required constants
+from info import CHANNELS, MOVIE_UPDATE_CHANNEL, ADMINS, LOG_CHANNEL
+from database.ia_filterdb import save_file, unpack_new_file_id
+from utils import temp
+from database.users_chats_db import db
 
 # Initialize Cinemagoer
 ia = Cinemagoer()
 LONG_IMDB_DESCRIPTION = False
 
 # Define channel
-POST_CHANNEL = -1001842826681  # Replace with your actual channel ID
+POST_CHANNEL = -1001842826681
 
 # Predefined genre list
 KNOWN_GENRES = {
-    "Action": "👊 Action", "Adventure": "🏔️ Adventure", "Animation": "🎨 Animation", "Biography": "📖 Biography", 
-    "Comedy": "🤣 Comedy", "Crime": "🕵️‍♂️ Crime", "Documentary": "🎥 Documentary", "Drama": "🎭 Drama", 
-    "Family": "👨‍👩‍👧 Family", "Fantasy": "🧚‍♂️ Fantasy", "Film-Noir": "🌑 Film-Noir", "History": "🏰 History", 
-    "Horror": "👻 Horror", "Music": "🎵 Music", "Musical": "🎤 Musical", "Mystery": "🔍 Mystery", 
-    "Romance": "💕 Romance", "Sci-Fi": "🚀 Sci-Fi", "Sport": "⚽ Sport", "Thriller": "😱 Thriller", 
+    "Action": "👊 Action", "Adventure": "🏔️ Adventure", "Animation": "🎨 Animation", "Biography": "📖 Biography",
+    "Comedy": "🤣 Comedy", "Crime": "🕵️‍♂️ Crime", "Documentary": "🎥 Documentary", "Drama": "🎭 Drama",
+    "Family": "👨‍👩‍👧 Family", "Fantasy": "🧚‍♂️ Fantasy", "Film-Noir": "🌑 Film-Noir", "History": "🏰 History",
+    "Horror": "👻 Horror", "Music": "🎵 Music", "Musical": "🎤 Musical", "Mystery": "🔍 Mystery",
+    "Romance": "💕 Romance", "Sci-Fi": "🚀 Sci-Fi", "Sport": "⚽ Sport", "Thriller": "😱 Thriller",
     "War": "⚔️ War", "Western": "🤠 Western"
 }
+
+processed_movies = set()
+media_filter = filters.document | filters.video
 
 def list_to_str(lst):
     if lst:
@@ -33,7 +37,6 @@ def list_to_str(lst):
 
 async def get_movie_details(title, year=None):
     try:
-        # First attempt with title and year if year is provided
         if year:
             movieid = ia.search_movie(f"{title.lower()} {year}", results=10)
             if movieid:
@@ -41,7 +44,6 @@ async def get_movie_details(title, year=None):
                 if filtered:
                     movieid = filtered[0].movieID
                 else:
-                    # Fall back to title-only search if no match with year
                     movieid = ia.search_movie(title.lower(), results=10)
                     if not movieid:
                         return None
@@ -52,7 +54,6 @@ async def get_movie_details(title, year=None):
             else:
                 return None
         else:
-            # Search with title only if no year is provided
             movieid = ia.search_movie(title.lower(), results=10)
             if not movieid:
                 return None
@@ -78,8 +79,6 @@ async def get_movie_details(title, year=None):
         if plot and len(plot) > 800:
             plot = plot[:800] + "..."
 
-        poster_url = movie.get('full-size cover url')
-
         return {
             'title': movie.get('title'),
             'votes': movie.get('votes'),
@@ -104,51 +103,123 @@ async def get_movie_details(title, year=None):
             'release_date': date,
             'year': movie.get('year'),
             'genres': list_to_str(movie.get("genres")),
-            'poster_url': poster_url,
             'plot': plot,
             'rating': str(movie.get("rating")),
             'url': f'https://www.imdb.com/title/tt{movieid}'
         }
-
     except Exception as e:
         print(f"An error occurred in get_movie_details: {e}")
         return None
 
 async def fetch_imdb_details_from_cinemagoer(title, year=None):
-    """Fetch IMDb data from Cinemagoer."""
     try:
         movie_data = await get_movie_details(title, year)
         if not movie_data:
             return None
-
         imdb_url = movie_data["url"]
         genre_list = movie_data["genres"].split(", ")
-
-        # Filter genres and limit to 3
         filtered_genres = [KNOWN_GENRES[g] for g in genre_list if g in KNOWN_GENRES][:3]
         genre_text = " ".join(f"#{g.split(' ')[1]}" for g in filtered_genres) if filtered_genres else "N/A"
-
         return {
             "imdb_url": imdb_url,
             "genre": genre_text
         }
-
     except Exception as e:
         print(f"Cinemagoer Error: {e}")
         return None
+
+async def movie_name_format(file_name):
+    filename = re.sub(r'http\S+', '', re.sub(r'@\w+|#\w+', '', file_name).replace('_', ' ').replace('[', '').replace(']', '').replace('(', '').replace(')', '').replace('{', '').replace('}', '').replace('.', ' ').replace('@', '').replace(':', '').replace(';', '').replace("'", '').replace('-', '').replace('!', '')).strip()
+    return filename
+
+@Client.on_message(filters.chat(CHANNELS) & media_filter)
+async def media(bot, message):
+    bot_id = bot.me.id
+    media = getattr(message, message.media.value, None)
+    if media.mime_type in ['video/mp4', 'video/x-matroska']:
+        media.file_type = message.media.value
+        media.caption = message.caption
+        success_sts = await save_file(media)
+        if success_sts == 'suc':
+            file_id, file_ref = unpack_new_file_id(media.file_id)
+            await send_movie_updates(bot, file_name=media.file_name, caption=media.caption, file_id=file_id)
+
+async def send_movie_updates(bot, file_name, caption, file_id):
+    try:
+        year_match = re.search(r"\b(19|20)\d{2}\b", caption)
+        year = year_match.group(0) if year_match else None
+        pattern = r"(?i)(?:s|season)0*(\d{1,2})"
+        season = re.search(pattern, caption)
+        if not season:
+            season = re.search(pattern, file_name)
+        if year:
+            file_name = file_name[:file_name.find(year) + 4]
+        if not year and season:
+            season = season.group(1) if season else None
+            file_name = file_name[:file_name.find(season) + 1]
+        language = ""
+        nb_languages = ["Hindi", "Bengali", "English", "Marathi", "Tamil", "Telugu", "Malayalam", "Kannada", "Punjabi", "Gujrati", "Korean", "Japanese", "Bhojpuri", "Dual", "Multi"]
+        for lang in nb_languages:
+            if lang.lower() in caption.lower():
+                language += f"{lang}, "
+        language = language.strip(", ") or "Unknown"
+        movie_name = await movie_name_format(file_name)
+        if movie_name in processed_movies:
+            return
+        processed_movies.add(movie_name)
+        season_identifier = f"S{season.zfill(2)}" if season else None
+        formatted_title = movie_name.replace(" ", "_").replace(".", "_")
+        if season_identifier:
+            button1_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}_{season_identifier}"
+            button2_url = f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}_{season_identifier}"
+        else:
+            button1_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}"
+            button2_url = f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}"
+        keyboard = InlineKeyboardMarkup([
+            [
+                InlineKeyboardButton("🥀 Pro Search 🌼", url=button1_url),
+                InlineKeyboardButton("🌿 Go Search🌸", url=button2_url)
+            ],
+            [InlineKeyboardButton("🤖 BOT UPDATES 🤖", url="https://t.me/+p0RB9_pSWnU2Nzll")]
+        ])
+        movie_data = await fetch_imdb_details_from_cinemagoer(movie_name, year)
+        if movie_data:
+            imdb_url = movie_data["imdb_url"]
+            genre = movie_data["genre"]
+            message_text = f"""
+<b>✅ {movie_name} {season_identifier if season_identifier else year if year else ""}</b>
+
+<b><blockquote>🎙 {language}</blockquote></b>
+
+⭐️ <b><a href="{imdb_url}">IMDB info</a></b>
+📽 Genre: {genre}
+"""
+        else:
+            message_text = f"""
+<b>✅ {movie_name} {season_identifier if season_identifier else year if year else ""}</b>
+
+<blockquote><b>🎙 {language}</b></blockquote>
+"""
+        await bot.send_message(
+            POST_CHANNEL,
+            message_text,
+            reply_markup=keyboard,
+            parse_mode=ParseMode.HTML,
+            disable_web_page_preview=True
+        )
+    except Exception as e:
+        print(f'Failed to send movie update. Error - {e}')
+        await bot.send_message(LOG_CHANNEL, f'Failed to send movie update. Error - {e}')
 
 @Client.on_message(filters.command("post"))
 async def generate_post(client, message):
     if message.from_user.id not in ADMINS:
         await message.reply_text("You are not authorized to use this command.")
         return
-
     if len(message.command) < 2:
         await message.reply_text("Please provide a movie title and language(s) (e.g., /post KGF 2018 English Tamil Telugu)")
         return
-
     user_input = message.command[1:]
-
     known_languages = {
         "arabic", "assamese", "bengali", "burmese", "chinese", "czech", "dutch", "english",
         "filipino", "french", "german", "gujarati", "hindi", "hungarian", "indonesian",
@@ -157,45 +228,31 @@ async def generate_post(client, message):
         "sinhala", "spanish", "swedish", "tamil", "telugu", "thai", "turkish",
         "ukrainian", "urdu", "vietnamese"
     }
-
-    # Detect series identifier (S01, S02, etc.)
     season_identifier = None
     pattern = re.compile(r"\b[Ss](\d{2})\b")
-
     for item in user_input:
         if pattern.match(item):
             season_identifier = item.upper()
             user_input.remove(item)
             break
-
-    # Extract languages
     languages = []
     while user_input and user_input[-1].lower() in known_languages:
         languages.append(user_input.pop())
-
     languages_text = ", ".join(languages) if languages else "Unknown"
-
-    # Extract year
     year = None
     for item in user_input:
         if item.isdigit() and len(item) == 4:
             year = item
             user_input.remove(item)
             break
-
     title = " ".join(user_input)
-
-    # Format button URLs (Movie or Series)
     formatted_title = title.replace(" ", "_").replace(".", "_")
-    
     if season_identifier:
         button1_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}_{season_identifier}"
         button2_url = f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}_{season_identifier}"
     else:
         button1_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}_{year}" if year else f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}"
         button2_url = f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}_{year}" if year else f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}"
-
-    # Create keyboard with two buttons on first line and updates button on second line
     keyboard = InlineKeyboardMarkup([
         [
             InlineKeyboardButton("🥀 Pro Search 🌼", url=button1_url),
@@ -203,36 +260,29 @@ async def generate_post(client, message):
         ],
         [InlineKeyboardButton("🤖 BOT UPDATES 🤖", url="https://t.me/+p0RB9_pSWnU2Nzll")]
     ])
-
-    # Fetch IMDb data from Cinemagoer, using year if available
     movie_data = await fetch_imdb_details_from_cinemagoer(title, year)
-
     if movie_data:
         imdb_url = movie_data["imdb_url"]
         genre = movie_data["genre"]
-
         message_text = f"""
 <b>✅ {title} {season_identifier if season_identifier else year if year else ""}</b>
 
 <b><blockquote>🎙 {languages_text}</blockquote></b>
 
-⭐️ <b><a href="{imdb_url}">IMDB info</a></b>  
-📽 Genre: {genre}  
+⭐️ <b><a href="{imdb_url}">IMDB info</a></b>
+📽 Genre: {genre}
 """
     else:
-        # If IMDb details are unavailable, post without them
         message_text = f"""
 <b>✅ {title} {season_identifier if season_identifier else year if year else ""}</b>
 
 <blockquote><b>🎙 {languages_text}</b></blockquote>
 """
-
-    # Send post
     await client.send_message(
-        POST_CHANNEL, 
-        message_text, 
-        reply_markup=keyboard, 
-        parse_mode=ParseMode.HTML, 
-        disable_web_page_preview=True  # Disables link previews
+        POST_CHANNEL,
+        message_text,
+        reply_markup=keyboard,
+        parse_mode=ParseMode.HTML,
+        disable_web_page_preview=True
     )
     await message.reply_text(f"The post for '{title} {season_identifier if season_identifier else year if year else ''}' has been successfully published in the channel!")
