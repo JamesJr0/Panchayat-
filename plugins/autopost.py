@@ -5,7 +5,7 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.enums import ParseMode
 from imdb import Cinemagoer
 from info import CHANNELS, ADMINS, LOG_CHANNEL
-from database.ia_filterdb import save_file1, save_file2, save_file3, save_file4, unpack_new_file_id
+from database.ia_filterdb import save_file1, save_file2, save_file3, save_file4, unpack_new_file_id, check_file
 from utils import temp
 
 # Initialize Cinemagoer
@@ -137,10 +137,15 @@ async def media(bot, message):
     if media.mime_type in ['video/mp4', 'video/x-matroska']:
         media.file_type = message.media.value
         media.caption = message.caption
-        success, status = await save_file1(media)
-        if success:
-            file_id, file_ref = unpack_new_file_id(media.file_id)
-            await send_movie_updates(bot, file_name=media.file_name, caption=media.caption, file_id=file_id)
+        # Check if file already exists in any database
+        if await check_file(media) == 'okda':
+            # Try saving to each database in sequence
+            for save_func in [save_file1, save_file2, save_file3, save_file4]:
+                success, status = await save_func(media)
+                if success:
+                    file_id, file_ref = unpack_new_file_id(media.file_id)
+                    await send_movie_updates(bot, file_name=media.file_name, caption=media.caption, file_id=file_id)
+                    break  # Stop after first successful save
 
 async def send_movie_updates(bot, file_name, caption, file_id):
     try:
