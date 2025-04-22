@@ -179,8 +179,13 @@ async def send_movie_updates(bot, file_name, caption, file_id):
             button1_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}_{season_identifier}"
             button2_url = f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}_{season_identifier}"
         else:
-            button1_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}_{year}" if year else f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}"
-            button2_url = f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}_{year}" if year else f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}"
+            # Avoid appending year if already in formatted_title
+            if year and formatted_title.endswith(f"_{year}"):
+                button1_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}"
+                button2_url = f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}"
+            else:
+                button1_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}_{year}" if year else f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}"
+                button2_url = f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}_{year}" if year else f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}"
         keyboard = InlineKeyboardMarkup([
             [
                 InlineKeyboardButton("🥀 Pro Search 🌼", url=button1_url),
