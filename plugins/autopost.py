@@ -5,7 +5,7 @@ from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.enums import ParseMode
 from imdb import Cinemagoer
 from info import CHANNELS, ADMINS, LOG_CHANNEL
-from database.ia_filterdb import save_file1, unpack_new_file_id
+from database.ia_filterdb import save_file1, save_file2, save_file3, save_file4, unpack_new_file_id
 from utils import temp
 
 # Initialize Cinemagoer
