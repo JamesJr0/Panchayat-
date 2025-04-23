@@ -151,6 +151,9 @@ async def send_movie_updates(bot, file_name, caption, file_id):
     try:
         year_match = re.search(r"\b(19|20)\d{2}\b", caption)
         year = year_match.group(0) if year_match else None
+        # Skip if year is not between 2023 and 2030
+        if year and (int(year) < 2023 or int(year) > 2030):
+            return
         pattern = r"(?i)(?:s|season)0*(\d{1,2})"
         season = re.search(pattern, caption)
         if not season:
