@@ -50,6 +50,7 @@ class Media2(Document):
     file_type = fields.StrField(allow_none=True)
     mime_type = fields.StrField(allow_none=True)
     caption = fields.StrField(allow_none=True)
+    copied_to = fields.ListField(allow_none=True)
 
     class Metaa:
         indexes = ('$file_name', )
