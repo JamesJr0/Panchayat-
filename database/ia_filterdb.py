@@ -3,7 +3,7 @@ from struct import pack
 from pyrogram.file_id import FileId
 from pymongo.errors import DuplicateKeyError
 from umongo import Instance, Document, fields
-from umongo.data_objects import List
+#from umongo.data_objects import List
 from motor.motor_asyncio import AsyncIOMotorClient
 from marshmallow.exceptions import ValidationError
 from info import *
@@ -51,7 +51,7 @@ class Media2(Document):
     file_type = fields.StrField(allow_none=True)
     mime_type = fields.StrField(allow_none=True)
     caption = fields.StrField(allow_none=True)
-    copied_to = fields.ListField(fields.IntField, default=List)
+    #copied_to = fields.ListField(fields.IntField, default=List)
 
     class Metaa:
         indexes = ('$file_name', )
