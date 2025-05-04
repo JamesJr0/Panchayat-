@@ -5,22 +5,18 @@ from database.users_chats_db import db
 from info import ADMINS
 from utils import broadcast_messages
 
-@Client.on_message(filters.command("broadcast") & filters.user(ADMINS) & filters.reply)
-async def verupikkals(bot, message):
-    # Parse skip argument from command
-    skip = 0
-    args = message.text.split()
-    for i, arg in enumerate(args):
-        if arg == "--skip" and i + 1 < len(args):
-            try:
-                skip = int(args[i + 1])
-            except ValueError:
-                pass  # Ignore if not a valid integer
+@Client.on_message(filters.command("skipbroadcast") & filters.user(ADMINS) & filters.reply)
+async def skip_broadcast(bot, message):
+    # Parse the skip number from the command
+    try:
+        skip = int(message.command[1])
+    except (IndexError, ValueError):
+        return await message.reply_text("Usage: /skipbroadcast <number> (as reply to message)")
 
     users = await db.get_all_users()  # Should be an async generator or list
     b_msg = message.reply_to_message
     sts = await message.reply_text(
-        f"Broadcasting your message...\nSkip: {skip}"
+        f"Broadcasting your message...\nSkipped: {skip} users."
     )
 
     start_time = datetime.datetime.now()
@@ -31,27 +27,7 @@ async def verupikkals(bot, message):
     failed = 0
     success = 0
 
-    # Skip the first N users from the async generator
-    if skip > 0:
-        skipped = 0
-        async for _ in users:
-            skipped += 1
-            if skipped >= skip:
-                break
-        # Now, users generator is exhausted up to skip
-        # But we need to continue from here, so we need to get a fresh generator
-        users = await db.get_all_users()
-        skipped = 0
-        async for _ in users:
-            skipped += 1
-            if skipped >= skip:
-                break
-        # Now, users generator is at the right position
-        # But this is not efficient, so let's do it in a single loop below
-
-    # Efficient way: single loop, skip first N users
     idx = 0
-    users = await db.get_all_users()
     async for user in users:
         if idx < skip:
             idx += 1
