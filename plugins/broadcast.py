@@ -31,10 +31,30 @@ async def verupikkals(bot, message):
     failed = 0
     success = 0
 
+    # Skip the first N users from the async generator
+    if skip > 0:
+        skipped = 0
+        async for _ in users:
+            skipped += 1
+            if skipped >= skip:
+                break
+        # Now, users generator is exhausted up to skip
+        # But we need to continue from here, so we need to get a fresh generator
+        users = await db.get_all_users()
+        skipped = 0
+        async for _ in users:
+            skipped += 1
+            if skipped >= skip:
+                break
+        # Now, users generator is at the right position
+        # But this is not efficient, so let's do it in a single loop below
+
+    # Efficient way: single loop, skip first N users
     idx = 0
+    users = await db.get_all_users()
     async for user in users:
-        idx += 1
-        if idx <= skip:
+        if idx < skip:
+            idx += 1
             continue
 
         try:
@@ -51,6 +71,7 @@ async def verupikkals(bot, message):
         except Exception:
             failed += 1
         done += 1
+        idx += 1
         await asyncio.sleep(2)
         if done % 20 == 0:
             await sts.edit(
