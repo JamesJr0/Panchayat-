@@ -4,7 +4,7 @@ from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.enums import ParseMode
 from imdb import Cinemagoer
-from info import CHANNELS, ADMINS, LOG_CHANNEL
+from info import CHANNELS, ADMINS, LOG_CHANNEL  
 from database.ia_filterdb import save_file1, save_file2, save_file3, save_file4, unpack_new_file_id, check_file
 from utils import temp
 
@@ -14,6 +14,7 @@ LONG_IMDB_DESCRIPTION = False
 
 # Define channel
 POST_CHANNEL = -1001842826681
+SOURCE_CHANNEL = [-1002101403583, -1002520495531]  
 
 # Predefined genre list
 KNOWN_GENRES = {
@@ -130,7 +131,7 @@ async def movie_name_format(file_name):
     filename = re.sub(r'http\S+', '', re.sub(r'@\w+|#\w+', '', file_name).replace('_', ' ').replace('[', '').replace(']', '').replace('(', '').replace(')', '').replace('{', '').replace('}', '').replace('.', ' ').replace('@', '').replace(':', '').replace(';', '').replace("'", '').replace('-', '').replace('!', '')).strip()
     return filename
 
-@Client.on_message(filters.chat(CHANNELS) & media_filter)
+@Client.on_message(filters.chat(SOURCE_CHANNEL) & media_filter)  # Changed to SOURCE_CHANNEL
 async def media(bot, message):
     bot_id = bot.me.id
     media = getattr(message, message.media.value, None)
