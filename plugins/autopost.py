@@ -169,7 +169,12 @@ async def send_movie_updates(bot, file_name, caption, file_id):
             file_name = file_name[:file_name.find(year) + 4]
 
         language = ""
-        nb_languages = ["Hindi", "Bengali", "English", "Marathi", "Tamil", "Telugu", "Malayalam", "Kannada", "Punjabi", "Gujrati", "Korean", "Japanese", "Chinese", "Dual", "Multi"]
+        nb_languages = ["arabic", "assamese", "bengali", "burmese", "chinese", "czech", "dutch", "english",
+        "filipino", "french", "german", "gujarati", "hindi", "hungarian", "indonesian",
+        "italian", "japanese", "kannada", "korean", "malay", "malayalam", "marathi",
+        "nepali", "pashto", "persian", "polish", "portuguese", "punjabi", "russian",
+        "sinhala", "spanish", "swedish", "tamil", "telugu", "thai", "turkish",
+        "ukrainian", "urdu", "vietnamese"]
         for lang in nb_languages:
             if lang.lower() in caption.lower():
                 language += f"{lang}, "
