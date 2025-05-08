@@ -152,57 +152,44 @@ async def send_movie_updates(bot, file_name, caption, file_id):
     try:
         year_match = re.search(r"\b(19|20)\d{2}\b", caption)
         year = year_match.group(0) if year_match else None
-
         # Skip if year is not between 2023 and 2030
         if year and (int(year) < 2023 or int(year) > 2030):
             return
-
-        # Fixed season parsing logic
-        pattern = r"(?i)\b(?:season[\s._-]?(\d{1,2})|s(\d{1,2})(?!\d))"
-        season_match = re.search(pattern, caption or "")
-        if not season_match:
-            season_match = re.search(pattern, file_name or "")
-        season = next((s for s in season_match.groups() if s), None)
-        season = season.zfill(2) if season else None
-
+        pattern = r"(?i)(?:s|season)0*(\d{1,2})"
+        season = re.search(pattern, caption)
+        if not season:
+            season = re.search(pattern, file_name)
         if year:
             file_name = file_name[:file_name.find(year) + 4]
-
+        if not year and season:
+            season = season.group(1) if season else None
+            file_name = file_name[:file_name.find(season) + 1]
         language = ""
-        nb_languages = ["arabic", "assamese", "bengali", "burmese", "chinese", "czech", "dutch", "english",
-        "filipino", "french", "german", "gujarati", "hindi", "hungarian", "indonesian",
-        "italian", "japanese", "kannada", "korean", "malay", "malayalam", "marathi",
-        "nepali", "pashto", "persian", "polish", "portuguese", "punjabi", "russian",
-        "sinhala", "spanish", "swedish", "tamil", "telugu", "thai", "turkish",
-        "ukrainian", "urdu", "vietnamese"]
+        nb_languages = ["Hindi", "Bengali", "English", "Marathi", "Tamil", "Telugu", "Malayalam", "Kannada", "Punjabi", "Gujrati", "Korean", "Japanese", "Chinese", "Dual", "Multi"]
         for lang in nb_languages:
             if lang.lower() in caption.lower():
                 language += f"{lang}, "
         language = language.strip(", ") or "Unknown"
-
         movie_name = await movie_name_format(file_name)
         if movie_name in processed_movies:
             return
         processed_movies.add(movie_name)
-
-        season_identifier = f"S{season}" if season else None
+        season_identifier = f"S{season.zfill(2)}" if season else None
         formatted_title = movie_name.replace(" ", "_").replace(".", "_")
-
         # Remove season from formatted_title if present to avoid duplication
         if season_identifier and season_identifier in formatted_title:
             formatted_title = formatted_title[:formatted_title.rfind(season_identifier)].rstrip("_")
-
         if season_identifier:
             button1_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}_{season_identifier}"
             button2_url = f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}_{season_identifier}"
         else:
+            # Avoid appending year if already in formatted_title
             if year and formatted_title.endswith(f"_{year}"):
                 button1_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}"
                 button2_url = f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}"
             else:
                 button1_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}_{year}" if year else f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}"
                 button2_url = f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}_{year}" if year else f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}"
-
         keyboard = InlineKeyboardMarkup([
             [
                 InlineKeyboardButton("🥀 Pro Search 🌼", url=button1_url),
@@ -210,7 +197,6 @@ async def send_movie_updates(bot, file_name, caption, file_id):
             ],
             [InlineKeyboardButton("🤖 BOT UPDATES 🤖", url="https://t.me/+p0RB9_pSWnU2Nzll")]
         ])
-
         movie_data = await fetch_imdb_details_from_cinemagoer(movie_name, year)
         if movie_data:
             imdb_url = movie_data["imdb_url"]
@@ -229,7 +215,6 @@ async def send_movie_updates(bot, file_name, caption, file_id):
 
 <blockquote><b>🎙 {language}</b></blockquote>
 """
-
         await bot.send_message(
             POST_CHANNEL,
             message_text,
