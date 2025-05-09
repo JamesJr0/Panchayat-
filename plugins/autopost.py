@@ -174,8 +174,7 @@ async def send_movie_updates(bot, file_name, caption, file_id):
         if movie_name in processed_movies:
             return
         processed_movies.add(movie_name)
-        # Season identifier with leading zeros (e.g., S01, S12)
-        season_identifier = f"S{season.group(1).zfill(2)}" if season else None
+        season_identifier = f"S{season.zfill(2)}" if season else None
         formatted_title = movie_name.replace(" ", "_").replace(".", "_")
         # Remove season from formatted_title if present to avoid duplication
         if season_identifier and season_identifier in formatted_title:
@@ -202,9 +201,8 @@ async def send_movie_updates(bot, file_name, caption, file_id):
         if movie_data:
             imdb_url = movie_data["imdb_url"]
             genre = movie_data["genre"]
-            # Include season identifier or year in the title
             message_text = f"""
-<b>✅ {movie_name} {season_identifier if season_identifier else year if year else ''}</b>
+<b>✅ {movie_name}</b>
 
 <b><blockquote>🎙 {language}</blockquote></b>
 
@@ -212,9 +210,8 @@ async def send_movie_updates(bot, file_name, caption, file_id):
 📽 Genre: {genre}
 """
         else:
-            # Include season identifier or year in the title
             message_text = f"""
-<b>✅ {movie_name} {season_identifier if season_identifier else year if year else ''}</b>
+<b>✅ {movie_name}</b>
 
 <blockquote><b>🎙 {language}</b></blockquote>
 """
@@ -228,6 +225,7 @@ async def send_movie_updates(bot, file_name, caption, file_id):
     except Exception as e:
         print(f'Failed to send movie update. Error - {e}')
         await bot.send_message(LOG_CHANNEL, f'Failed to send movie update. Error - {e}')
+
 @Client.on_message(filters.command("post"))
 async def generate_post(client, message):
     if message.from_user.id not in ADMINS:
