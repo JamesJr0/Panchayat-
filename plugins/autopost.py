@@ -181,15 +181,15 @@ async def send_movie_updates(bot, file_name, caption, file_id):
             formatted_title = formatted_title[:formatted_title.rfind(season_identifier)].rstrip("_")
         if season_identifier:
             button1_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}_{season_identifier}"
-            button2_url = f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}_{season_identifier}"
+            button2_url = f"http://t.me/ProSearchSuzzy_Bot?start=search_{formatted_title}_{season_identifier}"
         else:
             # Avoid appending year if already in formatted_title
             if year and formatted_title.endswith(f"_{year}"):
                 button1_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}"
-                button2_url = f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}"
+                button2_url = f"http://t.me/ProSearchSuzzy_Bot?start=search_{formatted_title}"
             else:
                 button1_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}_{year}" if year else f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}"
-                button2_url = f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}_{year}" if year else f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}"
+                button2_url = f"http://t.me/ProSearchSuzzy_Bot?start=search_{formatted_title}_{year}" if year else f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}"
         keyboard = InlineKeyboardMarkup([
             [
                 InlineKeyboardButton("🥀 Pro Search 🌼", url=button1_url),
@@ -264,10 +264,10 @@ async def generate_post(client, message):
     formatted_title = title.replace(" ", "_").replace(".", "_")
     if season_identifier:
         button1_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}_{season_identifier}"
-        button2_url = f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}_{season_identifier}"
+        button2_url = f"http://t.me/ProSearchSuzzy_Bot?start=search_{formatted_title}_{season_identifier}"
     else:
         button1_url = f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}_{year}" if year else f"http://t.me/Prosearchfatherbot?start=search_{formatted_title}"
-        button2_url = f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}_{year}" if year else f"http://t.me/ProSearchPro_Bot?start=search_{formatted_title}"
+        button2_url = f"http://t.me/ProSearchSuzzy_Bot?start=search_{formatted_title}_{year}" if year else f"http://t.me/ProSearchSuzzy_Bot?start=search_{formatted_title}"
     keyboard = InlineKeyboardMarkup([
         [
             InlineKeyboardButton("🥀 Pro Search 🌼", url=button1_url),
