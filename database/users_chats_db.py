@@ -142,5 +142,15 @@ class Database:
     async def get_db_size(self):
         return (await self.db.command("dbstats"))['dataSize']
 
+    async def set_skip_count(self, count: int):
+        await self.db.meta.update_one(
+            {"_id": "broadcast_skip"},
+            {"$set": {"count": count}},
+            upsert=True
+        )
+
+    async def get_skip_count(self):
+        data = await self.db.meta.find_one({"_id": "broadcast_skip"})
+        return data.get("count", 0) if data else 0
 
 db = Database(USERS_DB, DATABASE_NAME)
