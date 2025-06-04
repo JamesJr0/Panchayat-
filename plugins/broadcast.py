@@ -59,7 +59,8 @@ async def verupikkals(bot, message):
             await sts.edit(
                 f"Broadcast in progress:\n\n"
                 f"Total Users: {total_users}\n"
-                f"Completed: {done} / {total_users}\n"
+                f"Completed: {done + skip} / {total_users}\n"
+                f"⏩ Skipped: {skip}\n"
                 f"✅ Success: {success}\n"
                 f"⛔ Blocked: {blocked}\n"
                 f"🗑️ Deleted: {deleted}\n"
@@ -70,7 +71,8 @@ async def verupikkals(bot, message):
     await sts.edit(
         f"✅ Broadcast Completed in {time_taken}.\n\n"
         f"Total Users: {total_users}\n"
-        f"Completed: {done} / {total_users}\n"
+        f"Completed: {done + skip} / {total_users}\n"
+        f"⏩ Skipped: {skip}\n"
         f"✅ Success: {success}\n"
         f"⛔ Blocked: {blocked}\n"
         f"🗑️ Deleted: {deleted}\n"
