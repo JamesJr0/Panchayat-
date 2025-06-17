@@ -53,9 +53,9 @@ REQ_CHANNEL = int(REQ_CHANNEL) if REQ_CHANNEL and id_pattern.search(REQ_CHANNEL)
 JOIN_REQS_DB = environ.get("JOIN_REQS_DB", USERS_DB)
 
 # CHANNELS LIST KEYS
-UPDATES_CHANNEL = environ.get('UPDATES_CHANNEL', "https://t.me/+6guhTe_AHh44ODY1")
+UPDATES_CHANNEL = environ.get('UPDATES_CHANNEL', "https://t.me/+pwky7--tQxxkNmI1")
 MOVIE_GROUP = environ.get('MOVIE_GROUP', "https://t.me/+FTt3LaNOvYk1ZWY1")
-LATEST_UPLOADS = environ.get('LATEST_UPLOADS', "https://t.me/+-a7Vk8PDrCtiYTA9")
+LATEST_UPLOADS = environ.get('LATEST_UPLOADS', "https://t.me/+wcREYzq1DuQ4ZmI9")
 MOVIE_BOT = environ.get('MOVIE_BOT', "http://t.me/ProSearchMoviez_bot?start=help")
 
 # Others
@@ -64,7 +64,7 @@ SUPPORT_CHAT = environ.get('SUPPORT_CHAT', 'DKBOTxCHATS')
 P_TTI_SHOW_OFF = is_enabled((environ.get('P_TTI_SHOW_OFF', "False")), False)
 IMDB = is_enabled((environ.get('IMDB', "True")), True)
 SINGLE_BUTTON = is_enabled((environ.get('SINGLE_BUTTON', "True")), True)
-CUSTOM_FILE_CAPTION = environ.get("CUSTOM_FILE_CAPTION", "<b>{file_caption}\n\n➢Channel : <a href= https://t.me/+6guhTe_AHh44ODY1>@ProSearchFather</a></b>")
+CUSTOM_FILE_CAPTION = environ.get("CUSTOM_FILE_CAPTION", "<b>{file_caption}\n\n➢Channel : <a href= https://t.me/+wcREYzq1DuQ4ZmI9>@ProSearchFather</a></b>")
 BATCH_FILE_CAPTION = environ.get("BATCH_FILE_CAPTION", CUSTOM_FILE_CAPTION)
 IMDB_TEMPLATE = environ.get("IMDB_TEMPLATE", "<b>Hey </b> 😍\n\n<b>𝖧𝖾𝗋𝖾 𝖨𝗌 𝖶𝗁𝖺𝗍 𝖨 𝖥𝗈𝗎𝗇𝖽 𝖥𝗈𝗋 𝖸𝗈𝗎𝗋 𝖰𝗎𝖾𝗋𝗒 : <quote> {search} </quote> </b> 👇")
 LONG_IMDB_DESCRIPTION = is_enabled(environ.get("LONG_IMDB_DESCRIPTION", "False"), False)
