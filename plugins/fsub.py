@@ -109,7 +109,7 @@ async def ForceSub(bot: Client, update: Message, file_id: str = False, mode="che
         text = """**𝗛𝗼𝗹𝗱 𝗨𝗽 𝗕𝘂𝗱𝗱𝘆!!
 𝖶𝖾 𝖺𝗉𝗉𝗋𝖾𝖼𝗂𝖺𝗍𝖾 𝗒𝗈𝗎𝗋 𝖼𝗈𝗺𝗂𝗇𝗀 𝗍𝗈 𝗈𝗎𝗋 𝖻𝗈𝗍 , 𝖻𝗎𝗍 𝗒𝗈𝗎 𝗇𝖾𝖾𝖽 𝗍𝗈 𝖩𝗈𝗂𝗇 𝗈𝗎𝗋 𝗕𝗔𝗖𝗞𝗨𝗣 𝗖𝗛𝗔𝗡𝗡𝗘𝗟 𝖳𝗁𝖾𝗇 𝖼𝗅𝗂𝖼𝗸 𝗈𝗇 𝗧𝗥𝗬 𝗔𝗚𝗔𝗜𝗡 𝖡𝗎𝗍𝗍𝗈𝗻 𝖳𝗈 𝗀𝖾𝗍 𝖿𝗂𝗅𝖾𝗌.**"""
 
-        updates_channel_link = "https://t.me/+p0RB9_pSWnU2Nzll"
+        updates_channel_link = "https://t.me/+pwky7--tQxxkNmI1"
 
         # Define buttons inside the exception block
         buttons = [

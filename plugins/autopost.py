@@ -195,7 +195,7 @@ async def send_movie_updates(bot, file_name, caption, file_id):
                 InlineKeyboardButton("🥀 Pro Search 🌼", url=button1_url),
                 InlineKeyboardButton("🌿 Go Search🌸", url=button2_url)
             ],
-            [InlineKeyboardButton("🤖 BOT UPDATES 🤖", url="https://t.me/+p0RB9_pSWnU2Nzll")]
+            [InlineKeyboardButton("🤖 BOT UPDATES 🤖", url="https://t.me/+pwky7--tQxxkNmI1")]
         ])
         movie_data = await fetch_imdb_details_from_cinemagoer(movie_name, year)
         if movie_data:
@@ -273,7 +273,7 @@ async def generate_post(client, message):
             InlineKeyboardButton("🥀 Pro Search 🌼", url=button1_url),
             InlineKeyboardButton("🌿 Go Search🌸", url=button2_url)
         ],
-        [InlineKeyboardButton("🤖 BOT UPDATES 🤖", url="https://t.me/+p0RB9_pSWnU2Nzll")]
+        [InlineKeyboardButton("🤖 BOT UPDATES 🤖", url="https://t.me/+pwky7--tQxxkNmI1")]
     ])
     movie_data = await fetch_imdb_details_from_cinemagoer(title, year)
     if movie_data:
