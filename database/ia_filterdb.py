@@ -27,7 +27,7 @@ from info import (  # loads values from your .env / info.py
     DATABASE_NAME,
     COLLECTION_NAME,
     USE_CAPTION_FILTER,
-    BOT_USERNAME # Added for users/chats collection name if it's dynamic
+    # Removed BOT_USERNAME import
 )
 
 logger = logging.getLogger(__name__)
@@ -85,9 +85,8 @@ class User(Document):
     user_id = fields.IntField(attribute="_id")
     # Add other user fields if you have them, e.g., 'username', 'first_name', 'last_name'
     class Meta:
-        collection_name = f"users_{BOT_USERNAME.lower().replace('@','')}" # Common naming convention
-        # OR: collection_name = "users" # If your user collection is simply named "users"
-        # Adjust this collection_name to match your actual user collection in MongoDB!
+        collection_name = "users" # Assumed standard user collection name
+        # YOU MUST VERIFY THIS MATCHES YOUR ACTUAL USER COLLECTION NAME!
 
 # Register Chat model with inst1 (or whichever instance manages your chat collection)
 @inst1.register
@@ -95,9 +94,8 @@ class Chat(Document):
     chat_id = fields.IntField(attribute="_id")
     # Add other chat fields if you have them, e.g., 'title', 'type'
     class Meta:
-        collection_name = f"groups_{BOT_USERNAME.lower().replace('@','')}" # Common naming convention
-        # OR: collection_name = "chats" # If your chat collection is simply named "chats"
-        # Adjust this collection_name to match your actual chat collection in MongoDB!
+        collection_name = "chats" # Assumed standard chat collection name
+        # YOU MUST VERIFY THIS MATCHES YOUR ACTUAL CHAT COLLECTION NAME!
 
 
 # ------------------------------------------------------------------------ #
@@ -379,4 +377,3 @@ async def get_file_details(file_id_query: str):
         if res:
             return res
     return None
-
