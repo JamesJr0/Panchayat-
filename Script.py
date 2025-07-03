@@ -94,25 +94,13 @@ Cᴏᴍᴍᴀɴᴅs Aɴᴅ Usᴀɢᴇ:
 
     STATUS_TXT = """📂 𝖳𝗈𝗍𝖺𝗅 𝖥𝗂𝗅𝖾𝗌     - <code>{}</code>
 
-🗃️ Users DB
-👤 User: <code>{}</code>
-💬 Chats: <code>{}</code>
+👤 Users : <code>{users}</code>
+💬 Chats : <code>{chats}</code>
 
-🗃️ DB 1
-📁 Total Files: <code>{}</code>
-📊 Used Storage: <code>{}</code>MB
-
-🗃️ DB 2
-📁 Total Files: <code>{}</code>
-📊 Used Storage: <code>{}</code>MB
-
-🗃️ DB 3
-📁 Total Files: <code>{}</code>
-📊 Used Storage: <code>{}</code>MB
-
-🗃️ DB 4
-📁 Total Files: <code>{}</code>
-📊 Used Storage: <code>{}</code>MB
+🗃️ DB 1 - <code>{db1}</code>
+🗃️ DB 2 - <code>{db2}</code>
+🗃️ DB 3 - <code>{db3}</code>
+🗃️ DB 4 - <code>{db4}</code>
 """
 
 
