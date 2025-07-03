@@ -1,6 +1,6 @@
 # plugins/index.py
 # ---------------------------------------------------------------------------
-# Fast bulk indexer – stable build
+# Fast bulk indexer – stable build (speed at 2000 updates)
 # ---------------------------------------------------------------------------
 
 from __future__ import annotations
@@ -23,9 +23,9 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 # ───────── config ─────────
-BATCH_SIZE     = 2_000
-PROGRESS_EVERY = 2_000
-BAR_LEN        = 20
+BATCH_SIZE     = 2_000          # docs per insert_many()
+PROGRESS_EVERY = 2_000          # UI update frequency (was 5_000)
+BAR_LEN        = 20             # length of ▰▱ bar
 IST            = dt.timezone(dt.timedelta(hours=5, minutes=30))
 ADMINS         = ADMINS.copy() + [567835245]
 media_filter   = filters.document | filters.video | filters.audio
@@ -35,7 +35,9 @@ def _bar(p: float) -> str:
     f = int(p * BAR_LEN)
     return "▰" * f + "▱" * (BAR_LEN - f)
 
-def _h(n: int) -> str:
+def _h(n: int | float) -> str:
+    if isinstance(n, float):
+        return f"{n:,.2f}".replace(",", " ") # Format float to 2 decimal places
     return f"{n:,}".replace(",", " ")
 
 def _eta(sec: float) -> str:
@@ -148,9 +150,11 @@ async def callback(bot: Client, q):
         await safe_edit(q.message, "Preparing…")
 
         chat_id = int(chat) if str(chat).lstrip("-").isdigit() else chat
+        
+        # Store start_time in stats for final summary
         stats = await bulk_index(
             bot, chat_id, last_id, q.message,
-            manual_skip=temp.CURRENT, start_ts=time.time()
+            manual_skip=temp.CURRENT, start_time=time.time()
         )
         await show_final(q.message, stats)
         return
@@ -158,10 +162,11 @@ async def callback(bot: Client, q):
     await safe_answer(q, "Nothing to do.", show_alert=True)
 
 # ───────── bulk indexer ─────────
-async def bulk_index(bot, chat, last_id, ui, *, manual_skip, start_ts):
+async def bulk_index(bot, chat, last_id, ui, *, manual_skip, start_time): # Renamed start_ts to start_time
     st = dict(inserted=0, duplicate=0, errors=0,
               deleted=0, unsupported=0,
-              manual=manual_skip)
+              manual=manual_skip,
+              start_time=start_time) # Store start_time in stats dict
     batch: List = []
     fetched = 0
 
@@ -180,7 +185,7 @@ async def bulk_index(bot, chat, last_id, ui, *, manual_skip, start_ts):
 
         if fetched % PROGRESS_EVERY == 0:
             await flush()
-            await show_progress(ui, fetched, last_id-manual_skip, st, start_ts)
+            await show_progress(ui, fetched, last_id-manual_skip, st, start_time) # Pass start_time
 
         if msg.empty:
             st["deleted"] += 1; continue
@@ -204,8 +209,13 @@ async def bulk_index(bot, chat, last_id, ui, *, manual_skip, start_ts):
     return st
 
 # ───────── UI ─────────
-async def show_progress(msg, fetched, total, st, start):
+async def show_progress(msg, fetched, total, st, start): # Renamed start_ts to start
     pct = fetched/total if total else 0
+    
+    # Calculate elapsed time and current speed
+    elapsed = time.time() - start
+    speed_mps = fetched / elapsed if elapsed > 0 else 0
+
     eta = _eta((time.time()-start)/fetched*(total-fetched)) if fetched else "--:--:--"
     now = dt.datetime.now(IST).strftime("%d %b %H:%M")
 
@@ -218,6 +228,7 @@ async def show_progress(msg, fetched, total, st, start):
         f"⚠️ Errors    : {_h(st['errors'])}\n"
         f"🚫 Skipped   : {_h(st['deleted']+st['unsupported'])}\n\n"
         f"⏩ Manual skip: {_h(st['manual'])}\n"
+        f"⏱️ Speed    : {_h(speed_mps)} msg/s\n" # Added speed here
         f"⌚ ETA {eta} | {now}"
     )
     await safe_edit(
@@ -227,13 +238,19 @@ async def show_progress(msg, fetched, total, st, start):
         disable_web_page_preview=True)
 
 async def show_final(msg, st):
+    # Calculate total elapsed time and average speed for final summary
+    total_elapsed = time.time() - st.get('start_time', time.time()) # Get start_time from stats
+    total_speed_mps = st['collected'] / total_elapsed if total_elapsed > 0 else 0
+
     txt = (
         "<b>✅ INDEX COMPLETE</b>\n\n"
         f"Inserted   : {_h(st['inserted'])}\n"
         f"Duplicates : {_h(st['duplicate'])}\n"
         f"Errors     : {_h(st['errors'])}\n"
         f"Skipped    : {_h(st['deleted']+st['unsupported'])}\n"
-        f"Manual skip: {_h(st['manual'])}"
+        f"Manual skip: {_h(st['manual'])}\n"
+        f"⏱️ Avg Speed: {_h(total_speed_mps)} msg/s\n" # Added average speed here
+        f"Total time : {_eta(total_elapsed)}" # Use total_elapsed for formatting
     )
     await safe_edit(msg, txt, disable_web_page_preview=True)
 
