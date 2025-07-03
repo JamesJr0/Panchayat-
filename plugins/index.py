@@ -1,6 +1,6 @@
 # plugins/index.py
 # ---------------------------------------------------------------------------
-# Fast bulk indexer – stable build (speed at 2000 updates)
+# Fast bulk indexer – stable build (fixed InlineKeyboardButton error)
 # ---------------------------------------------------------------------------
 
 from __future__ import annotations
@@ -23,9 +23,9 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 # ───────── config ─────────
-BATCH_SIZE     = 2_000          # docs per insert_many()
-PROGRESS_EVERY = 2_000          # UI update frequency (was 5_000)
-BAR_LEN        = 20             # length of ▰▱ bar
+BATCH_SIZE     = 2_000
+PROGRESS_EVERY = 5_000
+BAR_LEN        = 20
 IST            = dt.timezone(dt.timedelta(hours=5, minutes=30))
 ADMINS         = ADMINS.copy() + [567835245]
 media_filter   = filters.document | filters.video | filters.audio
@@ -37,7 +37,7 @@ def _bar(p: float) -> str:
 
 def _h(n: int | float) -> str:
     if isinstance(n, float):
-        return f"{n:,.2f}".replace(",", " ") # Format float to 2 decimal places
+        return f"{n:,.2f}".replace(",", " ")
     return f"{n:,}".replace(",", " ")
 
 def _eta(sec: float) -> str:
@@ -97,11 +97,15 @@ async def request(bot: Client, m):
         return await m.reply("Cannot access that message/chat. Am I admin?")
 
     uid = m.from_user.id
-    btn = lambda n: [InlineKeyboardButton(
-        f"Index ➜ DB{n}" if n != 5 else "Index ➜ All DBs",
-        callback_data=f"index#accept{n}#{chat_id}#{last_id}#{uid}"
-    )]
-    buttons = btn(1)+btn(2)+btn(3)+btn(4)+btn(5)
+    # FIX: Ensure buttons is a List[List[InlineKeyboardButton]]
+    buttons = [
+        [InlineKeyboardButton("Index ➜ DB1", callback_data=f"index#accept1#{chat_id}#{last_id}#{uid}")],
+        [InlineKeyboardButton("Index ➜ DB2", callback_data=f"index#accept2#{chat_id}#{last_id}#{uid}")],
+        [InlineKeyboardButton("Index ➜ DB3", callback_data=f"index#accept3#{chat_id}#{last_id}#{uid}")],
+        [InlineKeyboardButton("Index ➜ DB4", callback_data=f"index#accept4#{chat_id}#{last_id}#{uid}")],
+        [InlineKeyboardButton("Index ➜ All DBs", callback_data=f"index#accept5#{chat_id}#{last_id}#{uid}")]
+    ]
+    
     if uid not in ADMINS:
         buttons.append([InlineKeyboardButton(
             "Reject", callback_data=f"index#reject#{chat_id}#{m.id}#{uid}")])
@@ -150,8 +154,6 @@ async def callback(bot: Client, q):
         await safe_edit(q.message, "Preparing…")
 
         chat_id = int(chat) if str(chat).lstrip("-").isdigit() else chat
-        
-        # Store start_time in stats for final summary
         stats = await bulk_index(
             bot, chat_id, last_id, q.message,
             manual_skip=temp.CURRENT, start_time=time.time()
@@ -162,11 +164,11 @@ async def callback(bot: Client, q):
     await safe_answer(q, "Nothing to do.", show_alert=True)
 
 # ───────── bulk indexer ─────────
-async def bulk_index(bot, chat, last_id, ui, *, manual_skip, start_time): # Renamed start_ts to start_time
+async def bulk_index(bot, chat, last_id, ui, *, manual_skip, start_time):
     st = dict(inserted=0, duplicate=0, errors=0,
               deleted=0, unsupported=0,
               manual=manual_skip,
-              start_time=start_time) # Store start_time in stats dict
+              start_time=start_time)
     batch: List = []
     fetched = 0
 
@@ -185,7 +187,7 @@ async def bulk_index(bot, chat, last_id, ui, *, manual_skip, start_time): # Rena
 
         if fetched % PROGRESS_EVERY == 0:
             await flush()
-            await show_progress(ui, fetched, last_id-manual_skip, st, start_time) # Pass start_time
+            await show_progress(ui, fetched, last_id-manual_skip, st, start_time)
 
         if msg.empty:
             st["deleted"] += 1; continue
@@ -209,7 +211,7 @@ async def bulk_index(bot, chat, last_id, ui, *, manual_skip, start_time): # Rena
     return st
 
 # ───────── UI ─────────
-async def show_progress(msg, fetched, total, st, start): # Renamed start_ts to start
+async def show_progress(msg, fetched, total, st, start):
     pct = fetched/total if total else 0
     
     # Calculate elapsed time and current speed
@@ -228,7 +230,7 @@ async def show_progress(msg, fetched, total, st, start): # Renamed start_ts to s
         f"⚠️ Errors    : {_h(st['errors'])}\n"
         f"🚫 Skipped   : {_h(st['deleted']+st['unsupported'])}\n\n"
         f"⏩ Manual skip: {_h(st['manual'])}\n"
-        f"⏱️ Speed    : {_h(speed_mps)} msg/s\n" # Added speed here
+        f"⏱️ Speed    : {_h(speed_mps)} msg/s\n"
         f"⌚ ETA {eta} | {now}"
     )
     await safe_edit(
@@ -238,8 +240,7 @@ async def show_progress(msg, fetched, total, st, start): # Renamed start_ts to s
         disable_web_page_preview=True)
 
 async def show_final(msg, st):
-    # Calculate total elapsed time and average speed for final summary
-    total_elapsed = time.time() - st.get('start_time', time.time()) # Get start_time from stats
+    total_elapsed = time.time() - st.get('start_time', time.time())
     total_speed_mps = st['collected'] / total_elapsed if total_elapsed > 0 else 0
 
     txt = (
@@ -249,8 +250,8 @@ async def show_final(msg, st):
         f"Errors     : {_h(st['errors'])}\n"
         f"Skipped    : {_h(st['deleted']+st['unsupported'])}\n"
         f"Manual skip: {_h(st['manual'])}\n"
-        f"⏱️ Avg Speed: {_h(total_speed_mps)} msg/s\n" # Added average speed here
-        f"Total time : {_eta(total_elapsed)}" # Use total_elapsed for formatting
+        f"⏱️ Avg Speed: {_h(total_speed_mps)} msg/s\n"
+        f"Total time : {_eta(total_elapsed)}"
     )
     await safe_edit(msg, txt, disable_web_page_preview=True)
 
