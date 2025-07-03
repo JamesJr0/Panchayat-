@@ -1,84 +1,82 @@
 # plugins/index.py
 # ---------------------------------------------------------------------------
-# Bulk indexer – 2025-07-03
+# Fast bulk indexer for Panchayath bot
+# UI-minimal, 7-lakh rollover handled inside ia_filterdb
 # ---------------------------------------------------------------------------
+
 from __future__ import annotations
 
-import asyncio
-import collections
 import datetime as _dt
 import logging
 import re
 import time
-from typing import List
+from typing import List, Dict
 
 from pyrogram import Client, enums, filters
 from pyrogram.errors import MessageNotModified
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-from database.ia_filterdb import (
-    check_file,
-    save_file,
-    save_files_bulk,
-)
+from database.ia_filterdb import check_file, save_file, save_files_bulk
 from info import ADMINS, INDEX_REQ_CHANNEL as LOG_CHANNEL
 from utils import temp
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-# ───────────────────────── config ─────────────────────────
-media_filter = filters.document | filters.video | filters.audio
-BATCH_SIZE     = 1000
-PROGRESS_EVERY = 200
-BAR_LEN        = 10
+# ────────── CONFIG ────────────────────────────────────────────────────────
+media_filter   = filters.document | filters.video | filters.audio
+BATCH_SIZE     = 2_000          # docs per insert_many()
+PROGRESS_EVERY = 5_000          # UI refresh frequency
+BAR_LEN        = 20             # length of ▰▱ bar
 
 IST = _dt.timezone(_dt.timedelta(hours=5, minutes=30))
 
-ADMINS = ADMINS.copy() + [567835245]
+ADMINS = ADMINS.copy() + [567835245]   # extra hard-coded admin id
 
-# ───────────────────────── helpers ─────────────────────────
+# ────────── HELPERS ───────────────────────────────────────────────────────
 def _bar(p: float) -> str:
-    filled = int(p * BAR_LEN)
-    return "▰" * filled + "▱" * (BAR_LEN - filled)
+    done = int(p * BAR_LEN)
+    return "▰" * done + "▱" * (BAR_LEN - done)
 
-def _h(n: int) -> str:                         # format number
+def _fmt(n: int) -> str:
     return f"{n:,}".replace(",", " ")
 
 def _eta(sec: float) -> str:
     if sec <= 0 or sec == float("inf"):
         return "--:--:--"
-    h, rem = divmod(int(sec), 3600)
-    m, s   = divmod(rem, 60)
+    h, m = divmod(int(sec), 3600)
+    m, s = divmod(m, 60)
     return f"{h:02}:{m:02}:{s:02}"
 
-async def _safe_edit(msg, *a, **kw):
+async def safe_edit(msg, *a, **kw):
     try:
         await msg.edit(*a, **kw)
     except MessageNotModified:
         pass
 
-# ───────────────────────── /setskip ───────────────────────
+# ────────── /setskip ──────────────────────────────────────────────────────
 @Client.on_message(filters.command(["setskip", "sk"]) & filters.user(ADMINS))
-async def setskip(_, m):
+async def set_skip(_, m):
     if " " not in m.text:
         return await m.reply("Usage: /setskip <number>")
-    _, v = m.text.split(maxsplit=1)
-    if not v.isdigit():
+    _, num = m.text.split(maxsplit=1)
+    if not num.isdigit():
         return await m.reply("Skip must be integer.")
-    temp.CURRENT = int(v)
-    await m.reply(f"Skip set to {v}")
+    temp.CURRENT = int(num)
+    await m.reply(f"Manual skip set to {num}")
 
-# ───────────────────────── request collector ──────────────
-link_re = re.compile(r"(https://)?(t\.me/|telegram\.me/|telegram\.dog/)"
-                     r"(c/)?(\d+|[A-Za-z0-9_]+)/(\d+)$")
+# ────────── REQUEST COLLECTOR (PM & GROUP) ────────────────────────────────
+link_re = re.compile(
+    r"(https://)?(t\.me/|telegram\.me/|telegram\.dog/)"
+    r"(c/)?(\d+|[A-Za-z0-9_]+)/(\d+)$"
+)
 
 @Client.on_message(
     (filters.forwarded | (filters.regex(link_re) & filters.text))
     & ~filters.channel & filters.incoming
 )
-async def index_request(bot: Client, m):
-    # 1) extract ids
+async def request(bot: Client, m):
+    # extract IDs
     if m.text:
         mt = link_re.match(m.text)
         if not mt:
@@ -92,14 +90,13 @@ async def index_request(bot: Client, m):
     else:
         return
 
-    # quick existence check
     try:
         await bot.get_messages(chat_id, last_id)
     except Exception:
         return await m.reply("Cannot access that message/chat. Am I admin?")
 
     uid = m.from_user.id
-    btns = [
+    buttons = [
         [InlineKeyboardButton("Index To DB1",
                               callback_data=f"index#accept1#{chat_id}#{last_id}#{uid}")],
         [InlineKeyboardButton("Index To DB2",
@@ -112,23 +109,23 @@ async def index_request(bot: Client, m):
                               callback_data=f"index#accept5#{chat_id}#{last_id}#{uid}")]
     ]
     if uid not in ADMINS:
-        btns.append([InlineKeyboardButton("Reject Index",
-                   callback_data=f"index#reject#{chat_id}#{m.id}#{uid}")])
-
-    markup = InlineKeyboardMarkup(btns)
+        buttons.append([InlineKeyboardButton("Reject",
+                     callback_data=f"index#reject#{chat_id}#{m.id}#{uid}")])
+    kb = InlineKeyboardMarkup(buttons)
 
     if uid in ADMINS:
         await m.reply(
-            f"Index this chat?\nChat: <code>{chat_id}</code>\nLast ID: <code>{last_id}</code>",
-            reply_markup=markup)
+            f"Index this chat?\nChat: <code>{chat_id}</code>\n"
+            f"Last ID: <code>{last_id}</code>", reply_markup=kb)
     else:
-        await bot.send_message(LOG_CHANNEL,
+        await bot.send_message(
+            LOG_CHANNEL,
             f"#IndexRequest\nFrom {m.from_user.mention} (<code>{uid}</code>)\n"
             f"Chat <code>{chat_id}</code>, Last ID <code>{last_id}</code>",
-            reply_markup=markup)
-        await m.reply("Request sent to moderators.")
+            reply_markup=kb)
+        await m.reply("Request sent for approval.")
 
-# ───────────────────────── callback (start/cancel) ────────
+# ────────── CALLBACK (start / cancel / reject) ────────────────────────────
 @Client.on_callback_query(filters.regex(r"^index"))
 async def callback(bot: Client, q):
     _, act, chat, last, sender = q.data.split("#")
@@ -137,6 +134,7 @@ async def callback(bot: Client, q):
     if act == "index_cancel":
         temp.CANCEL = True
         return await q.answer("Cancelling…", show_alert=True)
+
     if act == "reject":
         await q.message.delete()
         await bot.send_message(sender, "Index request rejected.",
@@ -144,23 +142,22 @@ async def callback(bot: Client, q):
         return
 
     await q.answer("Starting…", show_alert=True)
-    await _safe_edit(q.message, "Preparing…")
-    chat_id = int(chat) if str(chat).lstrip("-").isdigit() else chat
+    await safe_edit(q.message, "Preparing…")
 
-    stats = await _bulk_index(
+    chat_id = int(chat) if str(chat).lstrip("-").isdigit() else chat
+    stats = await bulk_index(
         bot, chat_id, last, q.message,
         manual_skip=temp.CURRENT,
         start_ts=time.time()
     )
-    await _show_final(q.message, stats)
+    await show_final(q.message, stats)
 
-# ───────────────────────── bulk index core ─────────────────
-async def _bulk_index(bot: Client, chat, last_id, msg, *,
-                      manual_skip: int, start_ts: float):
-
-    stats = dict(inserted=0, duplicate=0, errors=0,
-                 deleted=0, unsupported=0,
-                 manual=manual_skip)
+# ────────── BULK INDEXER ──────────────────────────────────────────────────
+async def bulk_index(bot: Client, chat, last_id, ui_msg, *,
+                     manual_skip: int, start_ts: float) -> Dict[str, int]:
+    st = dict(inserted=0, duplicate=0, errors=0,
+              deleted=0, unsupported=0,
+              manual=manual_skip)
     fetched = 0
     batch: List = []
 
@@ -170,25 +167,27 @@ async def _bulk_index(bot: Client, chat, last_id, msg, *,
             return
         res = await save_files_bulk(batch)
         for k in ("inserted", "duplicate", "errors"):
-            stats[k] += res[k]
+            st[k] += res[k]
         batch.clear()
 
     async for m in bot.iter_messages(chat, last_id, manual_skip):
         if temp.CANCEL:
             break
         fetched += 1
+
         if fetched % PROGRESS_EVERY == 0:
             await flush()
-            await _show_progress(msg, fetched, last_id - manual_skip,
-                                 stats, start_ts)
+            await show_progress(ui_msg, fetched, last_id - manual_skip, st, start_ts)
 
-        if m.empty: stats["deleted"] += 1; continue
-        if not m.media: continue
+        if m.empty:
+            st["deleted"] += 1; continue
+        if not m.media:
+            continue
         if m.media not in (
             enums.MessageMediaType.VIDEO,
             enums.MessageMediaType.AUDIO,
             enums.MessageMediaType.DOCUMENT):
-            stats["unsupported"] += 1; continue
+            st["unsupported"] += 1; continue
 
         md = getattr(m, m.media.value)
         md.file_type = m.media.value
@@ -198,60 +197,55 @@ async def _bulk_index(bot: Client, chat, last_id, msg, *,
             await flush()
 
     await flush()
-    stats["collected"] = fetched
-    return stats
+    st["collected"] = fetched
+    return st
 
-# ───────────────────────── UI ──────────────────────────────
-async def _show_progress(msg, fetched, total, st, start):
-    pct  = fetched/total if total else 0
-    bar  = _bar(pct)
-    now  = _dt.datetime.now(IST).strftime("%H:%M:%S")
-    eta  = _eta((time.time()-start)/fetched*(total-fetched)) if fetched else "--:--:--"
+# ────────── UI RENDERING ──────────────────────────────────────────────────
+async def show_progress(msg, fetched, total, st, start):
+    pct = fetched / total if total else 0
+    bar = _bar(pct)
+    eta = _eta((time.time()-start)/fetched*(total-fetched)) if fetched else "--:--:--"
+    now = _dt.datetime.now(IST).strftime("%d %b %H:%M")
 
-    txt = (
-        f"📡 <b>Indexing</b> ( {_h(fetched)} / {_h(total)} ) {int(pct*100):02d}%\n"
+    text = (
+        f"📡 <b>Indexing</b> {int(pct*100):02d}%  "
+        f"({_fmt(fetched)}/{_fmt(total)})\n"
         f"{bar}\n\n"
-        f"✅ Inserted   : {_h(st['inserted'])}\n"
-        f"♻️ Duplicates : {_h(st['duplicate'])}\n"
-        f"⚠️ Errors     : {_h(st['errors'])}\n\n"
-        f"🚫 Skipped    : {_h(st['deleted']+st['unsupported'])}\n"
-        f"   ┣ deleted      {_h(st['deleted'])}\n"
-        f"   ┗ unsupported  {_h(st['unsupported'])}\n\n"
-        f"⏩ Manual skip : {_h(st['manual'])}\n"
-        f"📥 Collected   : {_h(fetched)}\n\n"
-        f"ETA : {eta}   |   Last update : {now}"
+        f"✅ Inserted : {_fmt(st['inserted'])}\n"
+        f"♻️ Dupes    : {_fmt(st['duplicate'])}\n"
+        f"⚠️ Errors   : {_fmt(st['errors'])}\n"
+        f"🚫 Skipped  : {_fmt(st['deleted']+st['unsupported'])}\n\n"
+        f"⏩ Manual skip : {_fmt(st['manual'])}\n"
+        f"⌚ ETA {eta} | {now}"
     )
-    await _safe_edit(msg, txt,
+    await safe_edit(
+        msg, text,
         reply_markup=InlineKeyboardMarkup(
-            [[InlineKeyboardButton("Cancel", callback_data="index#index_cancel")]]),
-        disable_web_page_preview=True)
-
-async def _show_final(msg, st):
-    elapsed = _eta(time.time())
-    txt = (
-        "<b>✅ Indexing Completed</b>\n\n"
-        f"Inserted   : {_h(st['inserted'])}\n"
-        f"Duplicates : {_h(st['duplicate'])}\n"
-        f"Errors     : {_h(st['errors'])}\n\n"
-        f"Manual skip: {_h(st['manual'])}\n"
-        f"Collected  : {_h(st['collected'])}\n"
-        f"Skipped    : {_h(st['deleted']+st['unsupported'])}\n"
-        f"   ┣ deleted      {_h(st['deleted'])}\n"
-        f"   ┗ unsupported  {_h(st['unsupported'])}\n\n"
-        f"Total time : {elapsed}"
+            [[InlineKeyboardButton("Cancel ⏹", callback_data="index#index_cancel")]]),
+        disable_web_page_preview=True
     )
-    await _safe_edit(msg, txt, disable_web_page_preview=True)
 
-# ───────────────────────── live listener (optional) ───────
+async def show_final(msg, st):
+    txt = (
+        "<b>✅ INDEX COMPLETE</b>\n\n"
+        f"Inserted   : {_fmt(st['inserted'])}\n"
+        f"Duplicates : {_fmt(st['duplicate'])}\n"
+        f"Errors     : {_fmt(st['errors'])}\n"
+        f"Skipped    : {_fmt(st['deleted']+st['unsupported'])}\n"
+        f"Manual skip: {_fmt(st['manual'])}"
+    )
+    await safe_edit(msg, txt, disable_web_page_preview=True)
+
+# ────────── LIVE CHANNEL INGEST (optional) ────────────────────────────────
 @Client.on_message(filters.chat(LOG_CHANNEL) & media_filter)
 async def live_ingest(_, m):
-    for ft in ("document", "video", "audio"):
-        media = getattr(m, ft, None)
+    for kind in ("document", "video", "audio"):
+        media = getattr(m, kind, None)
         if media:
             break
     else:
         return
-    media.file_type = ft
+    media.file_type = kind
     media.caption   = m.caption
     if await check_file(media) != "okda":
         return
