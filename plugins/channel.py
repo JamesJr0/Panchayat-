@@ -9,7 +9,7 @@ media_filter = filters.document | filters.video | filters.audio
 save_counter = 0
 counter_lock = asyncio.Lock()
 
-save_functions = [save_file1, save_file3, save_file4]
+save_functions = [save_file1, save_file2, save_file3, save_file4]
 
 @Client.on_message(filters.chat(CHANNELS) & media_filter)
 async def media(bot, message):
@@ -28,7 +28,7 @@ async def media(bot, message):
     if is_new_file == "okda":
         global save_counter
         async with counter_lock:
-            save_func = save_functions[save_counter % 3]
+            save_func = save_functions[save_counter % 4]
             save_counter += 1
         await save_func(media)
     else:
