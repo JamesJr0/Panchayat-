@@ -27,6 +27,7 @@ from info import (  # loads values from your .env / info.py
     DATABASE_NAME,
     COLLECTION_NAME,
     USE_CAPTION_FILTER,
+    BOT_USERNAME # Added for users/chats collection name if it's dynamic
 )
 
 logger = logging.getLogger(__name__)
@@ -74,6 +75,31 @@ Media4 = _register(inst4)
 
 MEDIA_CLASSES = [Media1, Media2, Media3, Media4]
 
+# --- User and Chat Models (IMPORTANT: Adjust collection_name if different) ---
+# Assuming these user and chat collections are typically in the main database (db1)
+# Adjust if your bot uses separate databases/collections for users/chats.
+
+# Register User model with inst1 (or whichever instance manages your user collection)
+@inst1.register
+class User(Document):
+    user_id = fields.IntField(attribute="_id")
+    # Add other user fields if you have them, e.g., 'username', 'first_name', 'last_name'
+    class Meta:
+        collection_name = f"users_{BOT_USERNAME.lower().replace('@','')}" # Common naming convention
+        # OR: collection_name = "users" # If your user collection is simply named "users"
+        # Adjust this collection_name to match your actual user collection in MongoDB!
+
+# Register Chat model with inst1 (or whichever instance manages your chat collection)
+@inst1.register
+class Chat(Document):
+    chat_id = fields.IntField(attribute="_id")
+    # Add other chat fields if you have them, e.g., 'title', 'type'
+    class Meta:
+        collection_name = f"groups_{BOT_USERNAME.lower().replace('@','')}" # Common naming convention
+        # OR: collection_name = "chats" # If your chat collection is simply named "chats"
+        # Adjust this collection_name to match your actual chat collection in MongoDB!
+
+
 # ------------------------------------------------------------------------ #
 # Configuration                                                            #
 # ------------------------------------------------------------------------ #
@@ -116,7 +142,12 @@ def _norm(name: str) -> str:
 # Internal helpers                                                         #
 # ------------------------------------------------------------------------ #
 async def _count(model: Document) -> int:
-    return await model.collection.estimated_document_count()
+    try:
+        return await model.collection.estimated_document_count()
+    except Exception as e:
+        logger.warning(f"Failed to get estimated_document_count for {model.__name__}: {e}")
+        # Fallback to count_documents if estimated fails, or return 0
+        return await model.collection.count_documents({})
 
 
 async def _pick_model(counts: List[int]) -> Tuple[Document, int]:
@@ -250,6 +281,40 @@ async def save_file3(m): return await _legacy(Media3, 3, m)
 async def save_file4(m): return await _legacy(Media4, 4, m)
 
 # ------------------------------------------------------------------------ #
+# Public count functions for stats (NEW)                                   #
+# ------------------------------------------------------------------------ #
+async def get_files_count_db1() -> int:
+    return await _count(Media1)
+
+async def get_files_count_db2() -> int:
+    return await _count(Media2)
+
+async def get_files_count_db3() -> int:
+    return await _count(Media3)
+
+async def get_files_count_db4() -> int:
+    return await _count(Media4)
+
+async def get_total_files_count() -> int:
+    counts = await asyncio.gather(*[_count(m) for m in MEDIA_CLASSES])
+    return sum(counts)
+
+async def get_users_count() -> int:
+    try:
+        return await User.collection.estimated_document_count()
+    except Exception as e:
+        logger.error(f"Error getting users count: {e}")
+        return 0
+
+async def get_chats_count() -> int:
+    try:
+        return await Chat.collection.estimated_document_count()
+    except Exception as e:
+        logger.error(f"Error getting chats count: {e}")
+        return 0
+
+
+# ------------------------------------------------------------------------ #
 # Duplicate check (optional)                                               #
 # ------------------------------------------------------------------------ #
 async def check_file(media):
@@ -314,3 +379,4 @@ async def get_file_details(file_id_query: str):
         if res:
             return res
     return None
+
