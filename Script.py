@@ -1,5 +1,26 @@
+# script.py
+# (Or whatever file contains your script class and possibly other handlers)
+
+import asyncio
+import time # Needed for _h helper if not already defined globally or imported
+
+from pyrogram import Client, filters
+# Import the new count functions from your database module
+from database.ia_filterdb import (
+    get_total_files_count,
+    get_files_count_db1,
+    get_files_count_db2,
+    get_files_count_db3,
+    get_files_count_db4,
+    get_users_count,
+    get_chats_count
+)
+
+# You will need to import ADMINS from info.py or define it here if it's not global
+from info import ADMINS, BOT_USERNAME # Ensure BOT_USERNAME is also imported
+
 class script(object):
-    START_TXT = """<b>𝖧𝖾𝗒 {},\n\n𝖨 𝖺𝗆 𝖠 𝖥𝗂𝗅𝗍𝖾𝗋 𝖡𝗈𝗍 𝖮𝖿𝖿𝗂𝖼𝗂𝖺𝗅𝗅𝗒 𝖬𝖺𝖽𝖾 𝖡𝗒 𝖳𝖾𝖺𝗆 <a href='https://t.me/ProSearchFather'>@𝖯𝗋𝗈𝖲𝖾𝖺𝗋𝖼𝗁𝖥𝖺𝗍𝗁𝖾𝗋</a>.\n\n𝖧𝖾𝗋𝖾 𝖸𝗈𝗎 𝖢𝖺𝗇 𝖱𝖾𝗊𝗎𝖾𝗌𝗍 𝖬𝗈𝗏𝗂𝖾/𝖲𝖾𝗋𝗂𝖾𝗌, 𝖩𝗎𝗌𝗍 𝖲𝖾𝗇𝗍 𝖬𝗈𝗏𝗂𝖾/𝖲𝖾𝗋𝗂𝖾𝗌 𝖭𝖺𝗆𝖾 𝖶𝗂𝗍𝗁 𝖯𝗋𝗈𝗉𝖾𝗋 <a href='https://www.google.com/'>𝖦𝗈𝗈𝗀𝗅𝖾</a> 𝖲𝗉𝖾𝗅𝗅𝗂𝗇𝗀..!!\n\nFᴏʀ Mᴏʀᴇ Dᴇᴛᴀɪʟꜱ Cʟɪᴄᴋ /help\n\n𝖢𝗁𝖾𝖼𝗄 𝖮𝗎𝗍 𝖠𝗅𝗅 𝖮𝗎𝗋 𝖫𝗂𝗇𝗄𝗌 /links</b>"""
+    START_TXT = """<b>𝖧𝖾𝗒 {},\n\n𝖨 𝖺𝗆 𝖠 𝖥𝗂𝗅𝗍𝖾𝗋 𝖡𝗈𝗍 𝖮𝖿𝖿𝗂𝖼𝗂𝖺𝗅𝗅𝗒 𝖬𝖺𝖽𝖾 B𝗒 𝖳𝖾𝖺𝗆 <a href='https://t.me/ProSearchFather'>@𝖯𝗋𝗈𝖲𝖾𝖺𝗋𝖼𝗁𝖥𝖺𝗍𝗁𝖾𝗋</a>.\n\n𝖧𝖾𝗋𝖾 𝖸𝗈𝗎 𝖢𝖺𝗇 𝖱𝖾𝗊𝗎𝖾𝗌𝗍 𝖬𝗈𝗏𝗂𝖾/𝖲𝖾𝗋𝗂𝖾𝗌, 𝖩𝗎𝗌𝗍 𝖲𝖾𝗇𝗍 𝖬𝗈𝗏𝗂𝖾/𝖲𝖾𝗋𝗂𝖾𝗌 𝖭𝖺𝗆𝖾 𝖶𝗂𝗍𝗁 𝖯𝗋𝗈𝗉𝖾𝗋 <a href='https://www.google.com/'>𝖦𝗈𝗈𝗀𝗅𝖾</a> 𝖲𝗉𝖾𝗅𝗅𝗂𝗇𝗀..!!\n\nFᴏʀ Mᴏʀᴇ Dᴇᴛᴀɪʟꜱ Cʟɪᴄᴋ /help\n\n𝖢𝗁𝖾𝖼𝗄 𝖮𝗎𝗍 𝖠𝗅𝗅 𝖮𝗎𝗋 𝖫𝗂𝗇𝗄𝗌 /links</b>"""
     LINKS_TXT = """<b>🔗 𝖢𝗁𝖾𝖼𝗄 𝖮𝗎𝗍 𝖠𝗅𝗅 𝖮𝗎𝗋 𝖫𝗂𝗇𝗄𝗌 𝖥𝗋𝗈𝗆 𝗍𝗁𝖾 𝖡𝗎𝗍𝗍𝗈𝗇𝗌 𝖦𝗂𝗏𝖾𝗇 𝖡𝖾𝗅𝗈𝗐.\n\n© 𝖳𝖾𝖺𝗆 <a href='https://t.me/ProSearchFather'>@𝖯𝗋𝗈𝖲𝖾𝖺𝗋𝖼𝗁𝖥𝖺𝗍𝗁𝖾𝗋</a></b>"""
     HELP_TXT = """<b>Bro, Check Movie Name In #Google and Try ! Then No Results Add Movie Year and Try , Again No Results ? It's Not Available In Our Database Or Movie Not Released !\n\nബ്രോ, മൂവിയുടെ പേര് മാത്രം #Google നോക്കിയിട്ട് അടിച്ചു നോക്കുക..!!\n\nഎന്നിട്ടും കിട്ടിയില്ലെങ്കിൽ പേരിന്റെ കൂടെ മൂവി ഇറങ്ങിയ വർഷം കൂടി അടിച്ചു നോക്ക് 😁\n\nഎനിയും കിട്ടിയില്ലെങ്കിൽ ആ മൂവി ഞങ്ങളുടെ ഡാറ്റാബേസിൽ ഇല്ല, അല്ലെങ്കിൽ ആ മൂവി ഇറങ്ങിയിട്ടില്ല എന്ന് മനസ്സിലാക്കുക! 🤗⚠️\n\n📌 Any Help For Movie Searching Contact Admin.</b>"""
     ABOUT_TXT = """<b>👋 Hello,</b>
@@ -54,7 +75,7 @@ Cᴏᴍᴍᴀɴᴅs Aɴᴅ Usᴀɢᴇ:
 2. Usᴇ /connect ᴀɴᴅ ᴄᴏɴɴᴇᴄᴛ ʏᴏᴜʀ ɢʀᴏᴜᴘ ᴛᴏ ᴛʜᴇ ʙᴏᴛ.
 3. Usᴇ /settings ᴏɴ ʙᴏᴛ's PM ᴀɴᴅ ᴛᴜʀɴ ᴏɴ AᴜᴛᴏFɪʟᴛᴇʀ ᴏɴ ᴛʜᴇ sᴇᴛᴛɪɴɢs ᴍᴇɴᴜ."""
     CONNECTION_TXT = """ʜᴇʟᴘ: <b>ᴄᴏɴɴᴇᴄᴛɪᴏɴꜱ</b>
-- ᴜꜱᴇᴅ ᴛᴏ ᴄᴏɴɴᴇᴄᴛ ʙᴏᴛ ᴛᴏ ᴘᴍ ꜰᴏʀ ᴍᴀɴᴀɢɪɴɢ ꜰɪʟᴛᴇʀꜱ 
+- ᴜꜱᴇᴅ ᴛᴏ ᴄᴏɴɴᴇᴄᴛ ʙᴏᴛ ᴛᴏ ᴘᴍ ꜰᴏʀ ᴍᴀɴᴀɢɪɴɢ ꜰɪʟᴛᴇʀꜱ
 - ɪᴛ ʜᴇʟᴘꜱ ᴛᴏ ᴀᴠᴏɪᴅ ꜱᴘᴀᴍᴍɪɴɢ ɪɴ ɢʀᴏᴜᴘꜱ.
 <b>ɴᴏᴛᴇ:</b>
 
@@ -65,7 +86,7 @@ Cᴏᴍᴍᴀɴᴅs Aɴᴅ Usᴀɢᴇ:
 • /connect  - <code>ᴄᴏɴɴᴇᴄᴛ ᴀ ᴘᴀʀᴛɪᴄᴜʟᴀʀ ᴄʜᴀᴛ ᴛᴏ ʏᴏᴜʀ ᴘᴍ</code>
 • /disconnect  - <code>ᴅɪꜱᴄᴏɴɴᴇᴄᴛ ꜰʀᴏᴍ ᴀ ᴄʜᴀᴛ</code>
 • /connections - <code>ʟɪꜱᴛ ᴀʟʟ ʏᴏᴜʀ ᴄᴏɴɴᴇᴄᴛɪᴏɴꜱ</code>"""
-    EXTRAMOD_TXT = """ʜᴇʟᴘ: Exᴛʀᴀ Mᴏᴅᴜʟᴇs
+    EXTRAMOD_TXT = """ʜᴇʟᴘ: Exᴛʀᴀ MᴏᴅᴜʟᴇS
 <b>ɴᴏᴛᴇ:</b>
 
 🏹ᴛʜᴇꜱᴇ ᴀʀᴇ ᴛʜᴇ ᴇxᴛʀᴀ ꜰᴇᴀᴛᴜʀᴇꜱ ᴏꜰ ᴛʜɪꜱ ʙᴏᴛ
@@ -77,7 +98,7 @@ Cᴏᴍᴍᴀɴᴅs Aɴᴅ Usᴀɢᴇ:
 • /search  - <code>ɢᴇᴛ ᴛʜᴇ ꜰɪʟᴍ ɪɴꜰᴏʀᴍᴀᴛɪᴏɴ ꜰʀᴏᴍ ᴠᴀʀɪᴏᴜꜱ ꜱᴏᴜʀᴄᴇꜱ.</code>"""
     ADMIN_TXT = """ʜᴇʟᴘ: Aᴅᴍɪɴ Mᴏᴅs
 <b>ɴᴏᴛᴇ:</b>
-Tʜɪs Mᴏᴅᴜʟᴇ Oɴʟʏ Wᴏʀᴋs Fᴏʀ Mʏ Aᴅᴍɪɴs
+Tʜɪs Mᴏᴅᴜʟᴇ Oɴʟʏ Wᴏʀks Fᴏʀ Mʏ Aᴅᴍɪɴs
 Cᴏᴍᴍᴀɴᴅs Aɴᴅ Usᴀɢᴇ:
 • /logs - <code>ᴛᴏ ɢᴇᴛ ᴛʜᴇ ʀᴇᴄᴇɴᴛ ᴇʀʀᴏʀꜱ</code>
 • /msonedb - <code>ᴛᴏ ɢᴇᴛ ꜱᴛᴀᴛᴜꜱ ᴏꜰ ꜰɪʟᴇꜱ ɪɴ ᴅʙ. [Tʜɪs Cᴏᴍᴍᴀɴᴅ Cᴀɴ Bᴇ Usᴇᴅ Bʏ Aɴʏᴏɴᴇ]</code>
@@ -90,7 +111,7 @@ Cᴏᴍᴍᴀɴᴅs Aɴᴅ Usᴀɢᴇ:
 • /unban  - <code>ᴛᴏ ᴜɴʙᴀɴ ᴀ ᴜꜱᴇʀ.</code>
 • /channel - <code>ᴛᴏ ɢᴇᴛ ʟɪꜱᴛ ᴏꜰ ᴛᴏᴛᴀʟ ᴄᴏɴɴᴇᴄᴛᴇᴅ ᴄʜᴀɴɴᴇʟꜱ</code>
 • /broadcast - <code>ᴛᴏ ʙʀᴏᴀᴅᴄᴀꜱᴛ ᴀ ᴍᴇꜱꜱᴀɢᴇ ᴛᴏ ᴀʟʟ ᴜꜱᴇʀꜱ</code>"""
-    
+
 
     STATUS_TXT = """📂 𝖳𝗈𝗍𝖺𝗅 𝖥𝗂𝗅𝖾𝗌     - <code>{}</code>
 
@@ -110,10 +131,40 @@ Tᴏᴛᴀʟ Mᴇᴍʙᴇʀs = <code>{}</code>
 Aᴅᴅᴇᴅ Bʏ - {}
 
 @ProSearchFather"""
-    
+
     LOG_TEXT_P = """#NewUser
 ID - <code>{}</code>
 Nᴀᴍᴇ - {}
 
 @ProSearchFather"""
-    
+
+# Helper function for formatting numbers, defined here if not global in your project
+def _h(n: int) -> str:
+    return f"{n:,}".replace(",", " ")
+
+# The /stats command handler
+@Client.on_message(filters.command("stats")) # Add & filters.user(ADMINS) if only for admins
+async def send_stats_command(client: Client, message):
+    # Fetch counts from the database
+    total_files = await get_total_files_count()
+    db1_count = await get_files_count_db1()
+    db2_count = await get_files_count_db2()
+    db3_count = await get_files_count_db3()
+    db4_count = await get_files_count_db4()
+
+    users_count = await get_users_count()
+    chats_count = await get_chats_count()
+
+    # Format the message using the STATUS_TXT template
+    stats_message = script.STATUS_TXT.format(
+        _h(total_files),
+        _h(users_count),
+        _h(chats_count),
+        _h(db1_count),
+        _h(db2_count),
+        _h(db3_count),
+        _h(db4_count)
+    )
+
+    await message.reply_text(stats_message)
+
