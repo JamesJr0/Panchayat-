@@ -1,35 +1,42 @@
+# plugins/channel.py   (new version)
+
 from pyrogram import Client, filters
 from info import CHANNELS
-from database.ia_filterdb import save_file1, save_file2, save_file3, save_file4, check_file
-import asyncio
+from database.ia_filterdb import (
+    save_file,      # automatic DB chooser  ➜ DB-1 → DB-2 → DB-3 → DB-4
+    check_file,
+)
+import logging
+
+logger = logging.getLogger(__name__)
 
 media_filter = filters.document | filters.video | filters.audio
 
-# Shared counter and lock for thread-safe updates
-save_counter = 0
-counter_lock = asyncio.Lock()
-
-save_functions = [save_file1, save_file2, save_file3, save_file4]
 
 @Client.on_message(filters.chat(CHANNELS) & media_filter)
-async def media(bot, message):
-    """Media Handler"""
+async def media_handler(bot, message):
+    """Handle incoming media from the indexed channels."""
     for file_type in ("document", "video", "audio"):
         media = getattr(message, file_type, None)
-        if media is not None:
+        if media:
             break
     else:
-        return
+        return  # nothing we care about
 
     media.file_type = file_type
     media.caption = message.caption
 
-    is_new_file = await check_file(media)
-    if is_new_file == "okda":
-        global save_counter
-        async with counter_lock:
-            save_func = save_functions[save_counter % 4]
-            save_counter += 1
-        await save_func(media)
-    else:
-        print("Skipped duplicate file from saving to DB")
+    # skip duplicates that already exist in any DB
+    if await check_file(media) != "okda":
+        logger.info("Duplicate file skipped")
+        return
+
+    # let ia_filterdb decide which DB to use
+    saved, code = await save_file(media)
+
+    if saved and code == 1:
+        logger.info("Stored %s in database", getattr(media, "file_name", "NO_FILE"))
+    elif code == 0:
+        logger.info("Duplicate detected while saving: %s", getattr(media, "file_name", "NO_FILE"))
+    else:  # code == 2 (validation error)
+        logger.warning("Validation error for: %s", getattr(media, "file_name", "NO_FILE"))
