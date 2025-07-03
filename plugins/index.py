@@ -1,6 +1,6 @@
 # plugins/index.py
 # ---------------------------------------------------------------------------
-# Fast bulk indexer – STABLE & CRASH-PROOF build
+# Fast bulk indexer – STABLE & CRASH-PROOF build (with speed and 2000 msg updates)
 # ---------------------------------------------------------------------------
 
 from __future__ import annotations
@@ -24,7 +24,7 @@ logger.setLevel(logging.INFO)
 
 # ───────── config ─────────
 BATCH_SIZE     = 2_000          # docs per insert_many()
-PROGRESS_EVERY = 2_000          # UI update frequency
+PROGRESS_EVERY = 2_000          # UI update frequency (set to 2000 messages)
 BAR_LEN        = 20             # length of ▰▱ bar
 IST            = dt.timezone(dt.timedelta(hours=5, minutes=30))
 ADMINS         = ADMINS.copy() + [567835245]
@@ -37,7 +37,7 @@ def _bar(p: float) -> str:
 
 def _h(n: int | float) -> str:
     if isinstance(n, float):
-        return f"{n:,.2f}".replace(",", " ")
+        return f"{n:,.2f}".replace(",", " ") # Format float to 2 decimal places
     return f"{n:,}".replace(",", " ")
 
 def _eta(sec: float) -> str:
@@ -75,8 +75,10 @@ async def set_skip(_, m):
     await m.reply(f"Manual skip set to {num}")
 
 # ───────── request collector ─────────
-link_re = re.compile(r"(https://)?(t\.me/|telegram\.me/|telegram\.dog/)"
-                     r"(c/)?(\d+|[A-Za-z0-9_]+)/(\d+)$")
+link_re = re.compile(
+    r"(https://)?(t\.me/|telegram\.me/|telegram\.dog/)"
+    r"(c/)?(\d+|[A-Za-z0-9_]+)/(\d+)$"
+)
 
 @Client.on_message(
     (filters.forwarded | (filters.regex(link_re) & filters.text))
@@ -101,7 +103,7 @@ async def request(bot: Client, m):
         return await m.reply("Cannot access that message/chat. Am I admin?")
 
     uid = m.from_user.id
-    # FIX: Correctly construct List[List[InlineKeyboardButton]] for Pyrogram
+    # Ensure buttons is a List[List[InlineKeyboardButton]]
     buttons = [
         [InlineKeyboardButton("Index ➜ DB1", callback_data=f"index#accept1#{chat_id}#{last_id}#{uid}")],
         [InlineKeyboardButton("Index ➜ DB2", callback_data=f"index#accept2#{chat_id}#{last_id}#{uid}")],
@@ -174,7 +176,7 @@ async def bulk_index(bot, chat, last_id, ui, *, manual_skip, start_time):
     st = dict(inserted=0, duplicate=0, errors=0,
               deleted=0, unsupported=0,
               manual=manual_skip,
-              start_time=start_time)
+              start_time=start_time) # Store start_time in stats dict
     batch: List = []
     fetched = 0
 
@@ -188,7 +190,7 @@ async def bulk_index(bot, chat, last_id, ui, *, manual_skip, start_time):
             for k in ("inserted", "duplicate", "errors"):
                 st[k] += res[k]
         except Exception as e:
-            logger.error(f"Error during save_files_bulk: {e}")
+            logger.error(f"Error during save_files_bulk: {e}", exc_info=True) # Log full traceback
             st['errors'] += len(batch) # Assume all in batch failed if unhandled
         batch.clear()
 
@@ -201,13 +203,13 @@ async def bulk_index(bot, chat, last_id, ui, *, manual_skip, start_time):
             fetched += 1
             if fetched % PROGRESS_EVERY == 0:
                 logger.info(f"Progress update: Fetched {fetched} messages. Calling show_progress.")
-                await flush()
+                await flush() # Flush before showing progress
                 await show_progress(ui, fetched, last_id-manual_skip, st, start_time)
 
             if msg.empty:
                 st["deleted"] += 1; continue
             if not msg.media:
-                continue
+                continue # Do not count as unsupported yet, just skip if no media
             if msg.media not in (
                 enums.MessageMediaType.VIDEO,
                 enums.MessageMediaType.AUDIO,
@@ -229,9 +231,10 @@ async def bulk_index(bot, chat, last_id, ui, *, manual_skip, start_time):
         logger.info(f"Indexing complete for chat {chat}. Stats: {st}")
     except Exception as e:
         logger.error(f"Unhandled error in bulk_index for chat {chat}: {e}", exc_info=True)
+        # Attempt to show an error message on UI if possible
         await safe_edit(ui, f"<b>❌ Indexing Failed</b>\n\nError: {e}\nCheck logs for details.", 
                         disable_web_page_preview=True)
-        st['errors'] += 1
+        st['errors'] += 1 # Ensure at least one error is counted
     return st
 
 # ───────── UI ─────────
