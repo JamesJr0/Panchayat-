@@ -2,7 +2,7 @@
 database/ia_filterdb.py   (drop-in replacement)
 
 Features added:
-- MAX_DOCS_PER_DB = 600_000  → automatic rollover DB-1 → DB-2 → DB-3 → DB-4
+- MAX_DOCS_PER_DB = 700_000  → automatic rollover DB-1 → DB-2 → DB-3 → DB-4
 - New helper `save_file()` picks the target DB; the old
   `save_file1 … save_file4` remain for backward compatibility.
 - `check_file`, `get_search_results`, `get_file_details` unchanged.
@@ -123,7 +123,7 @@ class Media4(Document):
 # ------------------------------------------------------------------------------
 
 MEDIA_CLASSES = [Media1, Media2, Media3, Media4]
-MAX_DOCS_PER_DB = 600_000  # 6-lakh threshold
+MAX_DOCS_PER_DB = 700_000  # 7-lakh threshold
 
 
 async def _doc_count(model: Document) -> int:
