@@ -20,6 +20,7 @@ from database.ia_filterdb import (
     check_file,
     save_file,
     save_files_bulk,
+    # No direct count functions here as it's not the stats handler
 )
 from info import ADMINS, INDEX_REQ_CHANNEL as LOG_CHANNEL
 from utils import temp
@@ -29,7 +30,7 @@ logger.setLevel(logging.INFO)
 
 # ───────────────────────── config ─────────────────────────
 media_filter = filters.document | filters.video | filters.audio
-BATCH_SIZE     = 3000  # Changed from 1000 to 3000
+BATCH_SIZE     = 3000 # Changed to 3000 as requested
 PROGRESS_EVERY = 200
 BAR_LEN        = 10
 
@@ -148,7 +149,7 @@ async def callback(bot: Client, q):
     chat_id = int(chat) if str(chat).lstrip("-").isdigit() else chat
 
     # Set start_time here for overall indexing duration calculation
-    temp.START_TIME = time.time() 
+    temp.START_TIME = time.time()
 
     stats = await _bulk_index(
         bot, chat_id, last, q.message,
@@ -238,7 +239,9 @@ async def _show_progress(msg, fetched, total, st, start_ts, current_ts): # Added
         disable_web_page_preview=True)
 
 async def _show_final(msg, st):
-    elapsed = _eta(time.time() - temp.START_TIME) # Using temp.START_TIME for accuracy
+    # Ensure temp.START_TIME is actually set when indexing begins.
+    # It's set in the callback function right before calling _bulk_index.
+    elapsed = _eta(time.time() - temp.START_TIME) if hasattr(temp, 'START_TIME') else "--:--:--"
     txt = (
         "<b>✅ Indexing Completed</b>\n\n"
         f"Inserted   : {_h(st['inserted'])}\n"
