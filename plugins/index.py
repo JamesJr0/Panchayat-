@@ -20,7 +20,6 @@ from database.ia_filterdb import (
     check_file,
     save_file,
     save_files_bulk,
-    # No direct count functions here as it's not the stats handler
 )
 from info import ADMINS, INDEX_REQ_CHANNEL as LOG_CHANNEL
 from utils import temp
@@ -30,7 +29,7 @@ logger.setLevel(logging.INFO)
 
 # ───────────────────────── config ─────────────────────────
 media_filter = filters.document | filters.video | filters.audio
-BATCH_SIZE     = 3000 # Changed to 3000 as requested
+BATCH_SIZE     = 5000
 PROGRESS_EVERY = 200
 BAR_LEN        = 10
 
@@ -132,12 +131,20 @@ async def index_request(bot: Client, m):
 # ───────────────────────── callback (start/cancel) ────────
 @Client.on_callback_query(filters.regex(r"^index"))
 async def callback(bot: Client, q):
-    _, act, chat, last, sender = q.data.split("#")
-    last, sender = int(last), int(sender)
-
-    if act == "index_cancel":
+    # Check for the simple "index#index_cancel" first
+    if q.data == "index#index_cancel":
         temp.CANCEL = True
         return await q.answer("Cancelling…", show_alert=True)
+
+    # For all other "index#" callbacks, unpack 5 values
+    try:
+        _, act, chat, last, sender = q.data.split("#")
+        last, sender = int(last), int(sender)
+    except ValueError:
+        logger.error(f"Failed to unpack callback data: {q.data}")
+        await q.answer("Error: Malformed callback data.", show_alert=True)
+        return
+
     if act == "reject":
         await q.message.delete()
         await bot.send_message(sender, "Index request rejected.",
@@ -154,7 +161,7 @@ async def callback(bot: Client, q):
     stats = await _bulk_index(
         bot, chat_id, last, q.message,
         manual_skip=temp.CURRENT,
-        start_ts=temp.START_TIME # Pass this to _bulk_index
+        start_ts=temp.START_TIME
     )
     await _show_final(q.message, stats)
 
@@ -177,13 +184,16 @@ async def _bulk_index(bot: Client, chat, last_id, msg, *,
             stats[k] += res[k]
         batch.clear()
 
+    # Reset temp.CANCEL at the start of a new indexing operation
+    temp.CANCEL = False
+
     async for m in bot.iter_messages(chat, last_id, manual_skip):
-        if temp.CANCEL:
+        if temp.CANCEL: # Check for cancellation during iteration
+            logger.info("Indexing cancelled by user.")
             break
         fetched += 1
         if fetched % PROGRESS_EVERY == 0:
             await flush()
-            # Pass the current time to calculate speed
             await _show_progress(msg, fetched, last_id - manual_skip,
                                  stats, start_ts, time.time())
 
@@ -199,7 +209,7 @@ async def _bulk_index(bot: Client, chat, last_id, msg, *,
         md.file_type = m.media.value
         md.caption   = m.caption
         batch.append(md)
-        if len(batch) >= BATCH_SIZE: # This condition now checks for 3000
+        if len(batch) >= BATCH_SIZE:
             await flush()
 
     await flush()
@@ -207,13 +217,13 @@ async def _bulk_index(bot: Client, chat, last_id, msg, *,
     return stats
 
 # ───────────────────────── UI ──────────────────────────────
-async def _show_progress(msg, fetched, total, st, start_ts, current_ts): # Added current_ts
+async def _show_progress(msg, fetched, total, st, start_ts, current_ts):
     pct  = fetched/total if total else 0
     bar  = _bar(pct)
     now  = _dt.datetime.now(IST).strftime("%H:%M:%S")
 
     elapsed_time = current_ts - start_ts
-    eta  = _eta(elapsed_time/fetched*(total-fetched)) if fetched and elapsed_time > 0 else "--:--:--"
+    eta  = _eta((elapsed_time/fetched)*(total-fetched)) if fetched and elapsed_time > 0 else "--:--:--"
 
     # Calculate speed
     speed = (fetched / elapsed_time) if elapsed_time > 0 else 0
@@ -239,8 +249,6 @@ async def _show_progress(msg, fetched, total, st, start_ts, current_ts): # Added
         disable_web_page_preview=True)
 
 async def _show_final(msg, st):
-    # Ensure temp.START_TIME is actually set when indexing begins.
-    # It's set in the callback function right before calling _bulk_index.
     elapsed = _eta(time.time() - temp.START_TIME) if hasattr(temp, 'START_TIME') else "--:--:--"
     txt = (
         "<b>✅ Indexing Completed</b>\n\n"
