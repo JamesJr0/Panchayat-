@@ -1,6 +1,6 @@
 # plugins/index.py
 # ---------------------------------------------------------------------------
-# Fast bulk indexer – stable build (fixed InlineKeyboardButton error)
+# Stable bulk indexer with improved error handling and logging
 # ---------------------------------------------------------------------------
 
 from __future__ import annotations
@@ -24,7 +24,7 @@ logger.setLevel(logging.INFO)
 
 # ───────── config ─────────
 BATCH_SIZE     = 2_000
-PROGRESS_EVERY = 5_000
+PROGRESS_EVERY = 2_000
 BAR_LEN        = 20
 IST            = dt.timezone(dt.timedelta(hours=5, minutes=30))
 ADMINS         = ADMINS.copy() + [567835245]
@@ -52,12 +52,17 @@ async def safe_edit(msg, *a, **kw):
         await msg.edit(*a, **kw)
     except MessageNotModified:
         pass
+    except Exception as e: # Catch other potential errors during edit
+        logger.error(f"Error during safe_edit: {e}")
 
 async def safe_answer(q, *a, **kw):
     try:
         await q.answer(*a, **kw)
     except QueryIdInvalid:
-        pass
+        # This is expected if the callback query expires before answering
+        logger.warning(f"Callback query expired for QID: {q.id}. Already handled.")
+    except Exception as e: # Catch other potential errors during answer
+        logger.error(f"Error during safe_answer: {e}")
 
 # ───────── /setskip ─────────
 @Client.on_message(filters.command(["setskip", "sk"]) & filters.user(ADMINS))
@@ -97,15 +102,11 @@ async def request(bot: Client, m):
         return await m.reply("Cannot access that message/chat. Am I admin?")
 
     uid = m.from_user.id
-    # FIX: Ensure buttons is a List[List[InlineKeyboardButton]]
-    buttons = [
-        [InlineKeyboardButton("Index ➜ DB1", callback_data=f"index#accept1#{chat_id}#{last_id}#{uid}")],
-        [InlineKeyboardButton("Index ➜ DB2", callback_data=f"index#accept2#{chat_id}#{last_id}#{uid}")],
-        [InlineKeyboardButton("Index ➜ DB3", callback_data=f"index#accept3#{chat_id}#{last_id}#{uid}")],
-        [InlineKeyboardButton("Index ➜ DB4", callback_data=f"index#accept4#{chat_id}#{last_id}#{uid}")],
-        [InlineKeyboardButton("Index ➜ All DBs", callback_data=f"index#accept5#{chat_id}#{last_id}#{uid}")]
-    ]
-    
+    btn = lambda n: [InlineKeyboardButton(
+        f"Index ➜ DB{n}" if n != 5 else "Index ➜ All DBs",
+        callback_data=f"index#accept{n}#{chat_id}#{last_id}#{uid}"
+    )]
+    buttons = btn(1)+btn(2)+btn(3)+btn(4)+btn(5)
     if uid not in ADMINS:
         buttons.append([InlineKeyboardButton(
             "Reject", callback_data=f"index#reject#{chat_id}#{m.id}#{uid}")])
@@ -150,10 +151,13 @@ async def callback(bot: Client, q):
         except ValueError:
             return await safe_answer(q, "Malformed.", show_alert=True)
 
-        await safe_answer(q, "Starting…", show_alert=True)
+        # Acknowledge callback immediately to prevent QueryIdInvalid
+        await safe_answer(q, "Starting…", show_alert=True) 
+        
         await safe_edit(q.message, "Preparing…")
 
         chat_id = int(chat) if str(chat).lstrip("-").isdigit() else chat
+        
         stats = await bulk_index(
             bot, chat_id, last_id, q.message,
             manual_skip=temp.CURRENT, start_time=time.time()
@@ -165,6 +169,7 @@ async def callback(bot: Client, q):
 
 # ───────── bulk indexer ─────────
 async def bulk_index(bot, chat, last_id, ui, *, manual_skip, start_time):
+    logger.info(f"Indexing started for chat {chat}, last_id {last_id}, skip {manual_skip}")
     st = dict(inserted=0, duplicate=0, errors=0,
               deleted=0, unsupported=0,
               manual=manual_skip,
@@ -176,45 +181,63 @@ async def bulk_index(bot, chat, last_id, ui, *, manual_skip, start_time):
         nonlocal batch
         if not batch:
             return
-        res = await save_files_bulk(batch)
-        for k in ("inserted", "duplicate", "errors"):
-            st[k] += res[k]
+        logger.info(f"Flushing batch of {len(batch)} items. Fetched: {fetched}")
+        try:
+            res = await save_files_bulk(batch)
+            for k in ("inserted", "duplicate", "errors"):
+                st[k] += res[k]
+        except Exception as e:
+            logger.error(f"Error during save_files_bulk: {e}")
+            st['errors'] += len(batch) # Assume all in batch failed if unhandled
         batch.clear()
 
-    async for msg in bot.iter_messages(chat, last_id, manual_skip):
-        if temp.CANCEL: break
-        fetched += 1
+    try:
+        async for msg in bot.iter_messages(chat, last_id, manual_skip):
+            if temp.CANCEL:
+                logger.info("Indexing cancelled by user.")
+                break
+            
+            fetched += 1
+            if fetched % PROGRESS_EVERY == 0:
+                logger.info(f"Progress update: Fetched {fetched} messages. Calling show_progress.")
+                await flush() # Flush before showing progress
+                await show_progress(ui, fetched, last_id-manual_skip, st, start_time)
 
-        if fetched % PROGRESS_EVERY == 0:
-            await flush()
-            await show_progress(ui, fetched, last_id-manual_skip, st, start_time)
+            if msg.empty:
+                st["deleted"] += 1; continue
+            if not msg.media:
+                continue # Do not count as unsupported yet, just skip if no media
+            if msg.media not in (
+                enums.MessageMediaType.VIDEO,
+                enums.MessageMediaType.AUDIO,
+                enums.MessageMediaType.DOCUMENT):
+                st["unsupported"] += 1; continue
 
-        if msg.empty:
-            st["deleted"] += 1; continue
-        if not msg.media:
-            continue
-        if msg.media not in (
-            enums.MessageMediaType.VIDEO,
-            enums.MessageMediaType.AUDIO,
-            enums.MessageMediaType.DOCUMENT):
-            st["unsupported"] += 1; continue
+            m = getattr(msg, msg.media.value)
+            m.file_type = msg.media.value
+            m.caption   = msg.caption
+            batch.append(m)
+            if len(batch) >= BATCH_SIZE:
+                logger.info(f"Batch full ({len(batch)}). Calling flush.")
+                await flush()
 
-        m = getattr(msg, msg.media.value)
-        m.file_type = msg.media.value
-        m.caption   = msg.caption
-        batch.append(m)
-        if len(batch) >= BATCH_SIZE:
-            await flush()
-
-    await flush()
-    st["collected"] = fetched
+        # Final flush after loop
+        logger.info("Loop finished. Performing final flush.")
+        await flush()
+        st["collected"] = fetched
+        logger.info(f"Indexing complete for chat {chat}. Stats: {st}")
+    except Exception as e:
+        logger.error(f"Unhandled error in bulk_index for chat {chat}: {e}", exc_info=True)
+        # Attempt to show an error message on UI if possible
+        await safe_edit(ui, f"<b>❌ Indexing Failed</b>\n\nError: {e}\nCheck logs for details.", 
+                        disable_web_page_preview=True)
+        st['errors'] += 1 # Ensure at least one error is counted
     return st
 
 # ───────── UI ─────────
 async def show_progress(msg, fetched, total, st, start):
     pct = fetched/total if total else 0
     
-    # Calculate elapsed time and current speed
     elapsed = time.time() - start
     speed_mps = fetched / elapsed if elapsed > 0 else 0
 
