@@ -118,10 +118,14 @@ Cᴏᴍᴍᴀɴᴅs Aɴᴅ Usᴀɢᴇ:
 👤 Users : <code>{}</code>
 💬 Chats : <code>{}</code>
 
-🗃️ DB 1 - <code>{}</code>
+🗃️ DB 1 - <code>{}</code
+🌡️ Size - <code>{}</code>Mb
 🗃️ DB 2 - <code>{}</code>
+🌡️ Size - <code>{}</code>Mb
 🗃️ DB 3 - <code>{}</code>
+🌡️ Size - <code>{}</code>Mb
 🗃️ DB 4 - <code>{}</code>
+🌡️ Size - <code>{}</code>Mb
 """
 
 
